@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>NoBoNoFo POC</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;background:#f4f4f7;color:#111}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#f4f4f7}
+button{font:inherit}
+.screen{display:none;min-height:100vh;padding:18px 18px 36px}
+.screen.on{display:block}
+.top{display:flex;align-items:center;justify-content:space-between;margin:8px 0 20px}
+.back{border:0;background:none;color:#b36b00;font-size:17px;padding:8px 0}
+h1{font-size:34px;line-height:1.05;margin:0 0 16px}
+h2{font-size:26px;margin:0 0 14px}
+.sub{color:#666}
+.shelf{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.book{border:0;background:none;padding:0;text-align:left}
+.cover{aspect-ratio:2/3;border-radius:6px;box-shadow:0 3px 12px #0002;padding:16px;display:flex;flex-direction:column;justify-content:space-between;background:white}
+.cover.h2g2{background:#171717;color:#fff}
+.cover.sea{background:#e7ddc8}
+.cover.tech{background:#d9e3eb}
+.cover.jeeves{background:#f0e0bc}
+.cover .title{font-weight:800;font-size:20px;line-height:1.05}
+.cover .author{font-size:13px;opacity:.75}
+.label{font-size:14px;margin-top:7px;font-weight:600}
+.paper{background:#fff;max-width:680px;margin:0 auto;min-height:calc(100vh - 36px);padding:30px 28px 60px;box-shadow:0 1px 9px #0001}
+.chapterlink{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #ddd;background:none;color:#0969da;padding:14px 0;font-size:18px}
+.pagehint{text-align:center;color:#777;font-size:13px;margin:12px 0}
+.pager{display:flex;gap:10px;justify-content:center;margin-top:24px}
+.pager button,.primary{border:0;border-radius:10px;padding:12px 16px;background:#111;color:#fff}
+.reading{font-family:Georgia,serif;font-size:20px;line-height:1.55}
+.reading p{margin:0 0 1em}
+.chapterhead{font-family:Georgia,serif;text-align:center;font-size:22px;margin:0 0 30px}
+#secretModal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}
+#secretModal.on{display:flex}
+#secretBox{width:100%;background:#fff;padding:18px;border-radius:18px 18px 0 0}
+#forceInput{width:100%;font-size:26px;padding:12px;border:1px solid #bbb;border-radius:10px;text-transform:none}
+.secretrow{display:flex;gap:10px;margin-top:12px}
+.secretrow button{flex:1;border:0;border-radius:10px;padding:12px}
+#armBtn{background:#111;color:white}
+#cancelBtn{background:#ddd}
+#statusDot{width:9px;height:9px;border-radius:50%;background:#bbb;display:inline-block}
+#statusDot.armed{background:#111}
+#h2g2Hotspot{position:relative}
+#armedNote{font-size:12px;color:#777;text-align:center;margin-top:10px}
+.smallcaps{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#777}
+</style>
+</head>
+<body>
+
+<section id="library" class="screen on">
+  <div class="top"><div></div><div class="smallcaps">Books <span id="statusDot"></span></div></div>
+  <h1>Library</h1><div id="debugForce" style="font:13px monospace;color:#555;margin:-6px 0 14px">DEBUG FORCE = (none)</div>
+  <div class="shelf">
+    <button class="book" data-book="h2g2">
+      <div class="cover h2g2"><div class="title">The Hitchhiker’s Guide to the Galaxy</div><div class="author">Douglas Adams</div></div>
+      <div class="label">The Hitchhiker’s Guide…</div>
+    </button>
+    <button class="book" data-book="sea">
+      <div class="cover sea"><div class="title">The Old Man and the Sea</div><div class="author">Ernest Hemingway</div></div>
+      <div class="label">The Old Man and the Sea</div>
+    </button>
+    <button class="book" data-book="tech">
+      <div class="cover tech"><div class="title">Fire in the Valley</div><div class="author">Freiberger &amp; Swaine</div></div>
+      <div class="label">Fire in the Valley</div>
+    </button>
+    <button class="book" data-book="jeeves">
+      <div class="cover jeeves"><div class="title">The Jeeves Omnibus I</div><div class="author">P. G. Wodehouse</div></div>
+      <div class="label">The Jeeves Omnibus I</div>
+    </button>
+  </div>
+</section>
+
+<section id="bookCover" class="screen">
+  <div class="top"><button class="back" data-go="library">‹ Library</button></div>
+  <div id="bookCoverInner"></div>
+</section>
+
+<section id="contents" class="screen">
+  <div class="top"><button class="back" data-go="bookCover">‹ Book</button><div class="smallcaps">Contents</div></div>
+  <div class="paper">
+    <h2 id="contentsTitle"></h2>
+    <div id="chapterLinks"></div>
+  </div>
+</section>
+
+<section id="reading" class="screen">
+  <div class="top"><button class="back" data-go="contents">‹ Contents</button><div id="pageCounter" class="smallcaps"></div></div>
+  <div class="paper reading"><div id="debugForceRead" style="font:13px monospace;color:#777;margin-bottom:16px"></div>
+    <div id="chapterHead" class="chapterhead"></div>
+    <div id="pageText"></div>
+    <div class="pagehint">Prototype: use ◀︎ / ▶︎ to stand in for flicking.</div>
+    <div class="pager"><button id="prevPage">◀︎</button><button id="nextPage">▶︎</button></div>
+  </div>
+</section>
+
+<div id="secretModal">
+  <div id="secretBox">
+    <div class="smallcaps">Session force word</div>
+    <input id="forceInput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Gophers">
+    <div class="secretrow"><button id="cancelBtn">Cancel</button><button id="armBtn">Arm</button></div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const $ = s => document.querySelector(s);
+const screens = [...document.querySelectorAll('.screen')];
+const state = {
+  forceWord: localStorage.getItem('nobonofoForceWord') || '',
+  bookId: null,
+  chapterId: null,
+  page: 0
+};
+
+// PURPOSELY TINY PROTOTYPE CONTENT.
+// Every reachable reading page contains a $$$ socket.
+const BOOKS = {
+  h2g2: {
+    title: "The Hitchhiker’s Guide to the Galaxy",
+    author: "Douglas Adams",
+    chapters: [{
+      id:"10", title:"Chapter 10 — Infinite Improbability",
+      pages:[
+        "Adams pauses here to explain the Infinite Improbability Drive: an impossible machine produced by calculating exactly how improbable it ought to be, supplying the number to a generator, and adding a really hot cup of tea.",
+        "The important point is not whether any of this makes scientific sense. In the book, improbability is treated as though it were merely another engineering problem waiting for sufficiently reckless people to solve it.",
+        "For present purposes, that is all Stanley needs from Douglas Adams. Close the book and see whether anything equally improbable happens elsewhere.",
+        "This fourth page exists only to prove that the prototype can move among several safe destinations."
+      ]
+    }]
+  },
+  sea: {
+    title:"The Old Man and the Sea", author:"Ernest Hemingway",
+    chapters:[{
+      id:"1", title:"Chapter 1",
+      pages:[
+        "The light had gone from the water and the old man watched the line in silence. That night I dreamed of $$$.",
+        "He woke before dawn and listened to the harbour. In the dream there had been only $$$, and the sea beyond them.",
+        "The boy asked whether he had slept well. The old man said yes, although $$$ had followed him through the night.",
+        "For a long while he said nothing. Then he smiled and thought again of $$$."
+      ]
+    }]
+  },
+  tech: {
+    title:"Fire in the Valley", author:"Freiberger & Swaine",
+    chapters:[{
+      id:"1", title:"Chapter 1 — Beginnings",
+      pages:[
+        "The call was late and the line was poor. Wozniak paused, then said, “It was staring us in the face the whole time. $$$.”",
+        "Nobody in the room knew what to make of the note. Across the top somebody had written one word: $$$.",
+        "Jobs looked at the sketch again. “You’re telling me the answer is $$$?” he said.",
+        "Years later, the surviving notebook still carried the same unexplained annotation: $$$."
+      ]
+    }]
+  },
+  jeeves: {
+    title:"The Jeeves Omnibus I", author:"P. G. Wodehouse",
+    chapters:[{
+      id:"1", title:"Chapter 1",
+      pages:[
+        "I asked Jeeves what he proposed for luncheon with the beloved aunt, whose feathers required smoothing. He considered the matter. “$$$, sir.”",
+        "Jeeves entered with the expression of a man who had already solved the difficulty. “The difficulty, sir, is $$$.”",
+        "I confess I was not entirely prepared for his answer. “$$$,” said Jeeves, as though nothing could be more obvious.",
+        "There was a pause. “And what,” I asked, “does Aunt Agatha have to do with $$$?”"
+      ]
+    }]
+  }
+};
+
+function show(id){
+  screens.forEach(s => s.classList.toggle('on', s.id===id));
+  window.scrollTo(0,0);
+}
+function updateDebug(){
+  const d = $('#debugForce');
+  if(d) d.textContent = 'DEBUG FORCE = ' + (state.forceWord || '(none)');
+}
+function armed(){
+  $('#statusDot').classList.toggle('armed', !!state.forceWord);
+  updateDebug();
+}
+function replaceSocket(text){
+  const w = state.forceWord || '$$$';
+  return String(text).split('$$$').join(w);
+}
+function openBook(id){
+  state.bookId=id; state.chapterId=null; state.page=0;
+  const b=BOOKS[id];
+  $('#bookCoverInner').innerHTML = `
+    <div class="paper" id="${id==='h2g2'?'h2g2Hotspot':''}">
+      <div class="smallcaps">${b.author}</div>
+      <h1 style="margin-top:14px">${b.title}</h1>
+      <p class="sub">${id==='h2g2'
+        ? 'Prototype input cover: press and hold anywhere on this white page to open the covert word-entry control.'
+        : 'Tap Contents to continue.'}</p>
+      <button class="primary" id="openContents">Contents</button>
+      ${id==='h2g2'?'<div id="armedNote">Long-press page = secret input (prototype only)</div>':''}
+    </div>`;
+  $('#openContents').onclick=()=>openContents();
+  if(id==='h2g2') attachSecretHold($('#h2g2Hotspot'));
+  show('bookCover');
+}
+function openContents(){
+  const b=BOOKS[state.bookId];
+  $('#contentsTitle').textContent=b.title;
+  $('#chapterLinks').replaceChildren();
+  b.chapters.forEach(ch=>{
+    const btn=document.createElement('button');
+    btn.className='chapterlink'; btn.textContent=ch.title;
+    btn.onclick=()=>openChapter(ch.id);
+    $('#chapterLinks').appendChild(btn);
+  });
+  show('contents');
+}
+function openChapter(chid){
+  state.chapterId=chid; state.page=0; renderPage(); show('reading');
+}
+function currentChapter(){
+  return BOOKS[state.bookId].chapters.find(c=>c.id===state.chapterId);
+}
+function renderPage(){
+  const ch=currentChapter();
+  const p=ch.pages[state.page];
+  $('#chapterHead').textContent=ch.title;
+  $('#pageText').textContent='';
+  const para=document.createElement('p');
+  para.textContent=replaceSocket(p);
+  $('#pageText').appendChild(para);
+  $('#pageCounter').textContent=`${state.page+1} / ${ch.pages.length}`;
+  $('#prevPage').disabled=state.page===0;
+  $('#nextPage').disabled=state.page===ch.pages.length-1;
+  const dr=$('#debugForceRead');
+  if(dr) dr.textContent='DEBUG FORCE = ' + (state.forceWord || '(none)');
+}
+$('#prevPage').onclick=()=>{if(state.page>0){state.page--;renderPage()}};
+$('#nextPage').onclick=()=>{const ch=currentChapter();if(state.page<ch.pages.length-1){state.page++;renderPage()}};
+
+document.querySelectorAll('.book').forEach(btn=>btn.onclick=()=>openBook(btn.dataset.book));
+document.querySelectorAll('[data-go]').forEach(btn=>btn.onclick=()=>{
+  const dest=btn.dataset.go;
+  if(dest==='bookCover') openBook(state.bookId); else show(dest);
+});
+
+let holdTimer=null;
+function attachSecretHold(target){
+  const start=e=>{
+    if(e.type==='touchstart') e.preventDefault();
+    holdTimer=setTimeout(openSecret,550);
+  };
+  const stop=()=>clearTimeout(holdTimer);
+  target.addEventListener('touchstart',start,{passive:false});
+  target.addEventListener('touchend',stop);
+  target.addEventListener('touchcancel',stop);
+  target.addEventListener('mousedown',start);
+  target.addEventListener('mouseup',stop);
+  target.addEventListener('mouseleave',stop);
+}
+function openSecret(){
+  $('#forceInput').value=state.forceWord;
+  $('#secretModal').classList.add('on');
+  setTimeout(()=>$('#forceInput').focus(),60);
+}
+function closeSecret(){ $('#secretModal').classList.remove('on'); }
+$('#cancelBtn').onclick=closeSecret;
+$('#armBtn').onclick=()=>{
+  state.forceWord=$('#forceInput').value.trim();
+  localStorage.setItem('nobonofoForceWord',state.forceWord);
+  armed();
+  closeSecret();
+};
+$('#forceInput').addEventListener('keydown',e=>{if(e.key==='Enter') $('#armBtn').click()});
+armed();
+updateDebug();
+})();
+</script>
+</body>
+</html>
