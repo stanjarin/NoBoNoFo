@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBo NoFo 0.64</title>
+<title>NoBo NoFo 0.65</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -196,98 +196,105 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 }
 
 
+
+
+/* 0.65 reader search control */
 .reader-search-dock{
   position:fixed;
   right:18px;
   bottom:18px;
-  width:54px;
-  height:54px;
+  width:48px;
+  height:48px;
   border:0;
   background:transparent;
-  z-index:60;
+  z-index:80;
   padding:0;
+  -webkit-tap-highlight-color:transparent;
 }
 .reader-search-dock::before{
   content:"";
   position:absolute;
-  width:20px;height:20px;
+  width:18px;height:18px;
   border:4px solid #0a64d8;
   border-radius:50%;
-  left:10px;top:8px;
+  left:8px;top:7px;
 }
 .reader-search-dock::after{
   content:"";
   position:absolute;
-  width:18px;height:4px;
+  width:16px;height:4px;
   background:#0a64d8;
   transform:rotate(45deg);
   transform-origin:left center;
-  left:31px;top:31px;
+  left:28px;top:29px;
   border-radius:2px;
 }
+
+/* Popup sits immediately above the search control. */
 .search-overlay{
   position:fixed;
   inset:0;
-  background:transparent;
-  z-index:70;
+  z-index:90;
   pointer-events:none;
+  background:transparent;
 }
-.search-overlay.on{
-  pointer-events:auto;
-}
+.search-overlay.on{pointer-events:auto}
 .search-sheet{
   position:absolute;
   right:18px;
-  bottom:82px;
-  width:min(72vw,330px);
-  transform:translateY(14px);
+  bottom:76px;
+  width:310px;
+  max-width:calc(100vw - 36px);
   opacity:0;
-  transition:transform .18s ease,opacity .18s ease;
+  transform:translateY(8px);
+  transition:opacity .14s ease,transform .14s ease;
 }
 .search-overlay.on .search-sheet{
-  transform:translateY(0);
   opacity:1;
+  transform:none;
 }
+
 .search-row,.theme-row{
   width:100%;
+  box-sizing:border-box;
   min-height:58px;
   border:0;
-  background:rgba(245,245,247,.98);
   border-radius:16px;
-  box-shadow:0 7px 24px rgba(0,0,0,.15);
+  background:rgba(244,244,246,.98);
+  box-shadow:0 6px 22px rgba(0,0,0,.14);
   display:flex;
   align-items:center;
-  box-sizing:border-box;
 }
 .search-row{
   position:relative;
-  padding:0 54px 0 20px;
+  padding:0 54px 0 18px;
 }
-.search-row-label{
-  font:22px -apple-system,BlinkMacSystemFont,sans-serif;
-  color:#111;
-  pointer-events:none;
-}
-.search-hidden-input{
-  position:absolute;
-  inset:0;
+.search-row input{
   width:100%;
-  height:100%;
-  opacity:0;
+  height:58px;
   border:0;
+  outline:0;
+  padding:0;
+  margin:0;
   background:transparent;
-  font-size:16px;
+  color:#111;
+  font:22px -apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-appearance:none;
+  appearance:none;
 }
+.search-row input::placeholder{color:#111;opacity:1}
+.search-row input::-webkit-search-cancel-button{display:none}
+
 .row-search-icon{
   position:absolute;
   right:18px;
   top:16px;
-  width:19px;height:19px;
+  width:18px;height:18px;
   border:4px solid #111;
   border-radius:50%;
   pointer-events:none;
 }
-.row-search-icon:after{
+.row-search-icon::after{
   content:"";
   position:absolute;
   width:14px;height:4px;
@@ -299,19 +306,18 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 .theme-row{
   margin-top:10px;
   justify-content:space-between;
-  padding:0 22px;
-  font:22px -apple-system,BlinkMacSystemFont,sans-serif;
+  padding:0 20px;
   color:#111;
+  font:21px -apple-system,BlinkMacSystemFont,sans-serif;
 }
-.aa-mark{
-  font:26px -apple-system,BlinkMacSystemFont,sans-serif;
-}
+.aa-mark{font:26px -apple-system,BlinkMacSystemFont,sans-serif}
+
 .overlay-results{
   margin-top:10px;
-  background:rgba(255,255,255,.98);
   border-radius:16px;
   overflow:hidden;
-  box-shadow:0 7px 24px rgba(0,0,0,.15);
+  background:#fff;
+  box-shadow:0 6px 22px rgba(0,0,0,.14);
 }
 .overlay-results:empty{display:none}
 .overlay-results .result{
@@ -324,6 +330,7 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
   padding:12px 14px;
   font:14px -apple-system,BlinkMacSystemFont,sans-serif;
   line-height:1.3;
+  color:#222;
 }
 .overlay-results .result:last-child{border-bottom:0}
 
@@ -333,7 +340,7 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.64</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.65</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -366,8 +373,7 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 <div id="searchOverlay" class="search-overlay" aria-hidden="true">
   <div class="search-sheet">
     <form id="searchForm" class="search-row" autocomplete="off">
-      <div class="search-row-label">Search Book</div>
-      <input id="searchInput" class="search-hidden-input" type="search" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" aria-label="Search Book">
+      <input id="searchInput" type="search" placeholder="Search Book" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" aria-label="Search Book">
       <span class="row-search-icon" aria-hidden="true"></span>
     </form>
     <button type="button" class="theme-row">
@@ -478,8 +484,7 @@ function openCover(id){
 $("#fullCover").onclick=()=>{clearTimeout(coverTimer);finishCoverTransition()};
 function openContents(id){
  if($("#searchOverlay")){ $("#searchOverlay").classList.remove("on"); $("#searchOverlay").setAttribute("aria-hidden","true"); }
- if($(".search-row-label")) $(".search-row-label").textContent="Search Book";
- if($("#searchInput")) $("#searchInput").value="";
+  if($("#searchInput")) $("#searchInput").value="";
  if($("#searchResults")) $("#searchResults").innerHTML="";
 
  clearTimeout(coverTimer);
@@ -566,7 +571,6 @@ searchForm.addEventListener("submit",e=>{
  setForce(w);
  searchInput.value="improbability";
  searchInput.blur();
- $(".search-row-label").textContent="improbability";
  $("#searchResults").innerHTML=`
    <button type="button" class="result"><b>Chapter 10</b><br>…Infinite Improbability Drive… generating finite amounts of improbability…</button>
    <button type="button" class="result"><b>Chapter 10</b><br>…the improbability factor rapidly reaches one to one…</button>

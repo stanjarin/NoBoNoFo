@@ -1,18 +1,21 @@
-# NoBo NoFo performance build 0.64
+# NoBo NoFo performance build 0.65
 
-SEARCH OVERLAY PASS
-- Magnifying glass moved from H2G2 title/header to bottom-right reader furniture.
-- Magnifying glass colour matches the other blue reader icons.
-- Search now opens as an Apple Books-style floating overlay over Contents.
-- Black percentage/progress bar omitted.
-- Overlay retains two rows:
-  1. Search Book — live arming control.
-  2. Themes & Settings / Aa — inert window dressing.
-- Keyboard Search submits/arms.
-- On arm: force word stores -> visible label changes to `improbability` -> plausible Chapter 10 results appear in the same overlay.
-- Result tap enters reader.
-- Existing Library image-map, cover slide, substitution engine and first-complete-sentence rule retained.
-- Visible marker: v0.64.
+SEARCH POPUP REPAIR
+
+0.64 problems:
+- Search field was deliberately transparent, so typed text was invisible and looked non-functional.
+- Popup geometry was oversized and floated too high.
+- Search dock placement read as if it were attached to the chapter list.
+
+0.65:
+- Search field is a real visible input: typed text is visible.
+- Placeholder reads Search Book.
+- Popup is a compact two-row floating panel above the bottom-right search control.
+- Themes & Settings / Aa remains inert window dressing.
+- Keyboard Search arms.
+- On arm the visible field becomes `improbability`, then results appear below the two rows.
+- Magnifier remains blue to match the other reader controls.
 - No assets changed.
+- Visible version marker: v0.65.
 
 UPLOAD FOUR ROOT FILES ONLY.
