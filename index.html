@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.51</title>
+<title>NoBoNoFo 0.52</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -52,8 +52,8 @@ button{font:inherit;color:inherit}
 #reset{position:fixed;left:0;bottom:0;width:18px;height:18px;opacity:.02;border:0}
 
 .real-library{position:relative;width:100%;height:100vh;overflow:hidden;background:#fff}
-.library-art{position:absolute;left:0;top:-5.8%;width:100%;height:105.8%;object-fit:fill;display:block}
-.library-hits{position:absolute;inset:0;pointer-events:none}
+.library-art{position:absolute;left:0;top:-5.8%;width:100%;height:105.8%;object-fit:fill;display:block;pointer-events:none;z-index:1}
+.library-hits{position:absolute;inset:0;pointer-events:auto;z-index:10}
 .library-hit{position:absolute;border:0;background:transparent;padding:0;pointer-events:auto}
 .force-debug{display:none}
 .cover-screen{background:#fff;position:relative;height:100vh;overflow:hidden}
@@ -80,7 +80,7 @@ button{font:inherit;color:inherit}
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.51</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.52</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -172,10 +172,29 @@ function shelf(){
  LIBRARY_ORDER.forEach(id=>{
    const bt=document.createElement("button"); bt.type="button"; bt.className="library-hit"; bt.dataset.book=id;
    bt.setAttribute("aria-label",BOOKS[id].title);
-   bt.onclick=()=>openCover(id);
+   bt.onclick=e=>{e.preventDefault();};
    el.append(bt);
  });
 }
+
+$("#libraryHits").addEventListener("click",e=>{
+  // Robust iPhone path: map tap coordinates directly onto the 3x3 cover grid.
+  // Prevent child-button bubbling from opening twice.
+  e.preventDefault();
+  e.stopPropagation();
+  const r=$("#libraryHits").getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width;
+  const y=(e.clientY-r.top)/r.height;
+
+  const cols=[[0.045,0.331],[0.355,0.641],[0.665,0.951]];
+  const rows=[[0.193,0.473],[0.488,0.724],[0.740,0.990]];
+  let c=-1, rr=-1;
+  cols.forEach((a,i)=>{if(x>=a[0]&&x<=a[1])c=i});
+  rows.forEach((a,i)=>{if(y>=a[0]&&y<=a[1])rr=i});
+  if(c<0||rr<0)return;
+  const id=LIBRARY_ORDER[rr*3+c];
+  if(id) openCover(id);
+});
 let coverTimer=null;
 function openCover(id){
  state.book=id;

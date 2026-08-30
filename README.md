@@ -1,16 +1,13 @@
-# NoBoNoFo performance build 0.51
+# NoBoNoFo performance build 0.52
 
-REPAIR BUILD ONLY
+LIBRARY TAP REPAIR
+- Visible version marker: v0.52.
+- Library artwork is now explicitly pointer-events:none.
+- Library hit layer is explicitly above it with z-index:10.
+- iPhone taps are handled by one robust coordinate-mapping listener over the 3x3 Library grid.
+- Existing child buttons remain only as fallback/accessibility geometry.
+- No assets changed.
+- Existing 0.5/0.51 cover auto-transition and H2G2 arming path retained.
+- Service worker cache bumped to nobonofo-0.52.
 
-Fixes:
-- Library made responsive again with explicit 3x3 absolute hit areas over Stanley's finished Library artwork.
-- H2G2 search-result path repaired to use the established chapter-opening machinery.
-- Visible `v0.51` marker added at bottom-right of Library.
-- Existing 0.5 cover auto-transition retained.
-- Existing H2G2 Contents -> Search -> arm -> "improbability" results retained.
-- Existing force/substitution engine retained.
-- Existing first-complete-sentence socket rule retained.
-- Service-worker cache bumped to `nobonofo-0.51`.
-
-Assets are unchanged from 0.4/0.5.
-Upload the FOUR ROOT FILES ONLY.
+UPLOAD FOUR ROOT FILES ONLY.
