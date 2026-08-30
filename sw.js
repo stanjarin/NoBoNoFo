@@ -1,4 +1,4 @@
-const CACHE = 'nobonofo-0.31';
+const CACHE = 'nobonofo-0.32';
 const CORE = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {

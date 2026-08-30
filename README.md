@@ -1,24 +1,18 @@
-# NoBoNoFo skeletal performance build 0.31
+# NoBoNoFo skeletal performance build 0.32
 
-Corrects 0.3 by adding the missing PWA machinery.
+BUGFIX:
+0.31 inserted $$$ only when a particular Lorem Ipsum phrase happened to be present.
+Result: many pages had no socket, so the armed word appeared to do nothing.
 
-FILES
-- index.html
-- manifest.webmanifest
-- sw.js
-- README.md
+0.32 gives every reachable dummy reading page one guaranteed $$$ socket.
 
-IMPORTANT ASSET
-Copy Stanley's finished 1024×1024 RGB/sRGB `BOOK ICON.png` into this folder
-before uploading the build to GitHub. The manifest already points to it.
+TEST
+1. Long-press H2G2 cover.
+2. Type GOPHERS and press Return.
+3. Tap a fake search result.
+4. Return to Library and choose any book.
+5. Open Chapter 3: The Good Bit.
+6. Every one of its five pages should contain GOPHERS.
 
-0.31 retains the 0.3 structural reader prototype:
-- 9-book library
-- contents/chapter navigation
-- chapter-opening + follower-page formats
-- horizontal page swipes
-- persistent $$$ substitution
-- temporary H2G2 search/arming fudge
-
-The finished Library/covers are not embedded in this package because those
-actual local artwork files were not available to this build process.
+Library visibly says BUILD 0.32.
+Service-worker cache bumped to nobonofo-0.32.
