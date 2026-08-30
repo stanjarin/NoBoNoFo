@@ -1,27 +1,26 @@
-# NoBo NoFo performance build 0.67
+# NoBo NoFo performance build 0.68
 
-CONTENTS BASE ARTWORK PASS
+HUCK FINN REAL-TEXT PASS
 
-0.67 leaves the working 0.66 search behaviour alone and changes only the Contents-page search trigger/base:
+0.68 preserves the working 0.67 shell, Contents base, search/arming behaviour and assets.
 
-- Removes the old lone floating magnifier.
-- Installs Stanley’s supplied full-width base strip (`assets/CONTENTS_BASE.png`) at the bottom of every Contents page.
-- The complete strip — back, forward, share, book and magnifier artwork — is one large search trigger.
-- Tapping anywhere on the strip opens the existing 0.66 Books-style search overlay.
-- Search/arming/results behaviour is otherwise unchanged.
-- Service-worker cache: `nobonofo-0.67`.
-- Visible version marker: v0.67.
+- Replaces dummy text in Huckleberry Finn with real Chapter III source text.
+- Five reading pages use the locked 13/16 serif reader typography.
+- Each reachable Huck page contains one $$$ socket in its first complete sentence.
+- Follower pages use a carried-over sentence fragment where useful.
+- All Huck chapter choices route to the same five-page Chapter III master while retaining the chosen superficial chapter number.
+- Huck Contents page starts use genuine-looking source page numbers: 17, 22, 28, 32, 36, 41, 48, 54.
+- No assets changed.
+- Search behaviour remains exactly as in 0.67, including the currently retained universal Contents-search/arming capability.
+- Service-worker cache: `nobonofo-0.68`.
+- Visible version marker: v0.68.
 
 ## GitHub upload
-Replace these FOUR ROOT FILES:
+Replace these FOUR ROOT FILES only:
 
 - `index.html`
 - `manifest.webmanifest`
 - `sw.js`
 - `README.md`
 
-And upload this ONE NEW ASSET to `/assets`:
-
-- `CONTENTS_BASE.png`
-
-No other assets need to be uploaded again.
+No assets need uploading.
