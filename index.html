@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.5</title>
+<title>NoBoNoFo 0.51</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -53,8 +53,8 @@ button{font:inherit;color:inherit}
 
 .real-library{position:relative;width:100%;height:100vh;overflow:hidden;background:#fff}
 .library-art{position:absolute;left:0;top:-5.8%;width:100%;height:105.8%;object-fit:fill;display:block}
-.library-hits{position:absolute;left:4.7%;right:4.0%;top:18.0%;bottom:7.8%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);column-gap:3.6%;row-gap:1.5%}
-.library-hit{border:0;background:transparent;padding:0}
+.library-hits{position:absolute;inset:0;pointer-events:none}
+.library-hit{position:absolute;border:0;background:transparent;padding:0;pointer-events:auto}
 .force-debug{display:none}
 .cover-screen{background:#fff;position:relative;height:100vh;overflow:hidden}
 .full-cover{width:100%;height:100%;object-fit:cover;display:block}
@@ -62,13 +62,25 @@ button{font:inherit;color:inherit}
 .searchBtn{position:absolute;right:52px;top:13px;border:0;background:transparent;font-size:30px;line-height:1;color:#111;display:none}
 #contents.h2g2-contents .searchBtn{display:block}
 #searchResults .result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #ddd;background:#fff;padding:14px 10px;font:15px -apple-system,BlinkMacSystemFont,sans-serif;line-height:1.3}
+
+.library-hit:nth-child(1){left:4.5%;top:19.3%;width:28.6%;height:28.0%}
+.library-hit:nth-child(2){left:35.5%;top:19.3%;width:28.6%;height:28.0%}
+.library-hit:nth-child(3){left:66.5%;top:19.3%;width:28.6%;height:28.0%}
+.library-hit:nth-child(4){left:4.5%;top:48.8%;width:28.6%;height:23.6%}
+.library-hit:nth-child(5){left:35.5%;top:48.8%;width:28.6%;height:23.6%}
+.library-hit:nth-child(6){left:66.5%;top:48.8%;width:28.6%;height:23.6%}
+.library-hit:nth-child(7){left:4.5%;top:74.0%;width:28.6%;height:25.0%}
+.library-hit:nth-child(8){left:35.5%;top:74.0%;width:28.6%;height:25.0%}
+.library-hit:nth-child(9){left:66.5%;top:74.0%;width:28.6%;height:25.0%}
+.version-tag{position:absolute;right:6px;bottom:3px;font:10px -apple-system,BlinkMacSystemFont,sans-serif;color:rgba(0,0,0,.42);z-index:20;pointer-events:none}
+
 </style>
 </head>
 <body>
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.51</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -158,7 +170,7 @@ function debug(){$("#debug").textContent="FORCE: "+(state.force||"(none)")}
 function shelf(){
  const el=$("#libraryHits"); el.replaceChildren();
  LIBRARY_ORDER.forEach(id=>{
-   const bt=document.createElement("button"); bt.className="library-hit"; bt.dataset.book=id;
+   const bt=document.createElement("button"); bt.type="button"; bt.className="library-hit"; bt.dataset.book=id;
    bt.setAttribute("aria-label",BOOKS[id].title);
    bt.onclick=()=>openCover(id);
    el.append(bt);
@@ -228,8 +240,8 @@ $("#searchInput").addEventListener("keydown",e=>{
    <button class="result" data-p="1"><b>Chapter 10</b><br>…improbability factor rapidly reaches one to one…</button>
    <button class="result" data-p="2"><b>Chapter 10</b><br>…the infinite improbability generator…</button>`;
  $("#searchResults").querySelectorAll(".result").forEach(bt=>bt.onclick=()=>{
-   state.book="h2g2"; state.chapter=9; state.page=0;
-   openReader();
+   state.book="h2g2";
+   openChapter("h2g2",9);
  });
 });
 $("#searchResults").onclick=()=>{state.book="h2g2";state.chapter=3;state.page=0;render();show("reading")};
