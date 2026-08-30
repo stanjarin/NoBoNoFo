@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.6</title>
+<title>NoBoNoFo 0.61</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -83,13 +83,53 @@ button{font:inherit;color:inherit}
 #search .searchbox{box-shadow:0 0 0 1px rgba(0,0,0,.06)}
 #searchResults{margin-top:8px}
 
+
+html,body,.screen,.library-art,.library-hits,.library-hit{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+.library-art{-webkit-user-drag:none}
+
+#contentsSearch{
+  position:absolute !important;
+  top:18px !important;
+  right:82px !important;
+  width:48px !important;
+  height:48px !important;
+  display:none !important;
+  border:0 !important;
+  background:transparent !important;
+  z-index:50 !important;
+  padding:0 !important;
+}
+#contents.h2g2-contents #contentsSearch{display:block !important}
+#contentsSearch::before{
+  content:"";
+  position:absolute;
+  width:20px;height:20px;
+  border:4px solid #222;
+  border-radius:50%;
+  left:8px;top:6px;
+}
+#contentsSearch::after{
+  content:"";
+  position:absolute;
+  width:17px;height:4px;
+  background:#222;
+  transform:rotate(45deg);
+  transform-origin:left center;
+  left:28px;top:28px;
+  border-radius:2px;
+}
+
 </style>
 </head>
 <body>
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.6</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.61</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -254,8 +294,17 @@ $("#slidewrap").addEventListener("touchend",e=>{let dx=e.changedTouches[0].clien
 $("#backContents").onclick=()=>openContents(state.book);
 $("#closeBook").onclick=()=>show("library");
 $("#closeContents").onclick=()=>show("library");
-$("#contentsSearch").onclick=()=>{
+
+$("#contentsSearch").onclick=(e)=>{
+ e.preventDefault();
+ e.stopPropagation();
  state.book="h2g2";
+ $("#searchInput").value="";
+ $("#searchResults").innerHTML="";
+ show("search");
+ setTimeout(()=>$("#searchInput").focus(),80);
+};
+
  $("#searchInput").value="";
  $("#searchResults").innerHTML="";
  show("search");
