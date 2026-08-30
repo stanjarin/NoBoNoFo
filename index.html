@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.52</title>
+<title>NoBoNoFo 0.6</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -52,7 +52,7 @@ button{font:inherit;color:inherit}
 #reset{position:fixed;left:0;bottom:0;width:18px;height:18px;opacity:.02;border:0}
 
 .real-library{position:relative;width:100%;height:100vh;overflow:hidden;background:#fff}
-.library-art{position:absolute;left:0;top:-5.8%;width:100%;height:105.8%;object-fit:fill;display:block;pointer-events:none;z-index:1}
+.library-art{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center top;display:block;pointer-events:none;z-index:1}
 .library-hits{position:absolute;inset:0;pointer-events:auto;z-index:10}
 .library-hit{position:absolute;border:0;background:transparent;padding:0;pointer-events:auto}
 .force-debug{display:none}
@@ -74,13 +74,22 @@ button{font:inherit;color:inherit}
 .library-hit:nth-child(9){left:66.5%;top:74.0%;width:28.6%;height:25.0%}
 .version-tag{position:absolute;right:6px;bottom:3px;font:10px -apple-system,BlinkMacSystemFont,sans-serif;color:rgba(0,0,0,.42);z-index:20;pointer-events:none}
 
+
+.cover-screen{transform:translateX(0);transition:transform .32s ease}
+.cover-screen.slide-off{transform:translateX(-100%)}
+#contents{background:#fff}
+#contentsSearch{font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+#search{background:#fff}
+#search .searchbox{box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+#searchResults{margin-top:8px}
+
 </style>
 </head>
 <body>
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.52</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.6</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -196,14 +205,24 @@ $("#libraryHits").addEventListener("click",e=>{
   if(id) openCover(id);
 });
 let coverTimer=null;
+function finishCoverTransition(){
+ const cs=$("#coverScreen");
+ cs.classList.add("slide-off");
+ setTimeout(()=>{
+   openContents(state.book);
+   cs.classList.remove("slide-off");
+ },320);
+}
 function openCover(id){
  state.book=id;
+ const cs=$("#coverScreen");
+ cs.classList.remove("slide-off");
  $("#fullCover").src="assets/"+ASSET[id];
  show("coverScreen");
  clearTimeout(coverTimer);
- coverTimer=setTimeout(()=>openContents(state.book),900);
+ coverTimer=setTimeout(finishCoverTransition,900);
 }
-$("#fullCover").onclick=()=>{clearTimeout(coverTimer);openContents(state.book)};
+$("#fullCover").onclick=()=>{clearTimeout(coverTimer);finishCoverTransition()};
 function openContents(id){
  clearTimeout(coverTimer);
  state.book=id; const b=BOOKS[id];
@@ -255,9 +274,9 @@ $("#searchInput").addEventListener("keydown",e=>{
  setForce(w);
  e.target.value="improbability";
  $("#searchResults").innerHTML=`
-   <button class="result" data-p="0"><b>Chapter 10</b><br>Infinite Improbability Drive… the principle of generating finite amounts of improbability…</button>
-   <button class="result" data-p="1"><b>Chapter 10</b><br>…improbability factor rapidly reaches one to one…</button>
-   <button class="result" data-p="2"><b>Chapter 10</b><br>…the infinite improbability generator…</button>`;
+   <button class="result" data-p="0"><b>Chapter 10</b><br>…Infinite Improbability Drive… generating finite amounts of improbability…</button>
+   <button class="result" data-p="1"><b>Chapter 10</b><br>…the improbability factor rapidly reaches one to one…</button>
+   <button class="result" data-p="2"><b>Chapter 10</b><br>…an infinite improbability generator…</button>`;
  $("#searchResults").querySelectorAll(".result").forEach(bt=>bt.onclick=()=>{
    state.book="h2g2";
    openChapter("h2g2",9);

@@ -1,13 +1,18 @@
-# NoBoNoFo performance build 0.52
+# NoBoNoFo performance build 0.6 — SHELL FREEZE CANDIDATE
 
-LIBRARY TAP REPAIR
-- Visible version marker: v0.52.
-- Library artwork is now explicitly pointer-events:none.
-- Library hit layer is explicitly above it with z-index:10.
-- iPhone taps are handled by one robust coordinate-mapping listener over the 3x3 Library grid.
-- Existing child buttons remain only as fallback/accessibility geometry.
-- No assets changed.
-- Existing 0.5/0.51 cover auto-transition and H2G2 arming path retained.
-- Service worker cache bumped to nobonofo-0.52.
+COSMETIC / BEHAVIOUR PASS
+- Library restored to original proportions: no vertical stretch or Safari-furniture compensation.
+- Target environment is the installed Home Screen PWA.
+- Full cover holds ~0.9 sec, then slides left into Contents.
+- Tap cover accelerates the same slide transition.
+- H2G2 Contents/Search/results given a light visual polish.
+- Existing image-map Library tap machinery retained.
+- Existing H2G2 arming/substitution engine retained untouched.
+- Existing first-complete-sentence socket rule retained.
+- Visible development marker: v0.6.
+- Service-worker cache: nobonofo-0.6.
 
+NO ASSET CHANGES.
 UPLOAD FOUR ROOT FILES ONLY.
+
+If this passes on iPhone, freeze shell and move to real text/pagination.
