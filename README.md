@@ -1,18 +1,15 @@
-# NoBoNoFo skeletal performance build 0.32
+# NoBoNoFo skeletal performance build 0.33
 
-BUGFIX:
-0.31 inserted $$$ only when a particular Lorem Ipsum phrase happened to be present.
-Result: many pages had no socket, so the armed word appeared to do nothing.
+LOCKED PAGINATION / SOCKET RULE
+- On every page containing $$$, the $$$ sentence is the FIRST COMPLETE sentence.
+- A tail fragment from the previous sentence may precede it.
+- Dummy proof text currently demonstrates:
+  “…isn’t what she thought. It was $$$.”
+- This supports the performance beat:
+  Sp reads the tail.
+  P: “No, the first complete sentence.”
+  Sp: “It was GOPHERS.”
 
-0.32 gives every reachable dummy reading page one guaranteed $$$ socket.
-
-TEST
-1. Long-press H2G2 cover.
-2. Type GOPHERS and press Return.
-3. Tap a fake search result.
-4. Return to Library and choose any book.
-5. Open Chapter 3: The Good Bit.
-6. Every one of its five pages should contain GOPHERS.
-
-Library visibly says BUILD 0.32.
-Service-worker cache bumped to nobonofo-0.32.
+Existing 0.32 arming/substitution remains.
+Library visibly says BUILD 0.33.
+Service-worker cache: nobonofo-0.33.

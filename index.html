@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.32</title>
+<title>NoBoNoFo 0.33</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -54,7 +54,7 @@ button{font:inherit;color:inherit}
 </head>
 <body>
 <section id="library" class="screen on library">
-  <h1>Library</h1><div class="debug">BUILD 0.32</div>
+  <h1>Library</h1><div class="debug">BUILD 0.33</div>
   <div class="debug" id="debug">FORCE: (none)</div>
   <div id="shelf" class="shelf"></div>
 </section>
@@ -118,8 +118,10 @@ titles.forEach((x,bi)=>{
    const pages=[];
    for(let p=0;p<5;p++){
      let paras=[lorem[(p+c)%lorem.length],lorem[(p+c+1)%lorem.length],lorem[(p+c+2)%lorem.length]];
-     // Guaranteed test socket on every reachable dummy page.
-     paras[1] = paras[1].replace(/\.$/, "") + " $$$.";
+     // LOCKED SOCKET RULE:
+     // $$$ must occur in the FIRST COMPLETE sentence on any armed page.
+     // A carried-over sentence tail may precede it for the "No, the first complete sentence" beat.
+     paras[0] = "…isn’t what she thought. It was $$$.";
      pages.push(paras);
    }
    chapters.push({id:c,title:`Chapter ${c}${c===3?": The Good Bit":""}`,start:6+(c-1)*27,pages});
