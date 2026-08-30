@@ -1,16 +1,20 @@
-# NoBoNoFo performance build 0.61
+# NoBo NoFo performance build 0.62
 
 REPAIR BUILD
 
-Fixes:
-- H2G2 Contents now has a guaranteed visible magnifying-glass Search icon beside the X.
-- Search icon is drawn in CSS rather than relying on a text glyph.
-- Search button is forced above the Contents UI with its own z-index.
-- Tap Search -> existing arming Search screen.
-- iOS text/image selection and touch-callout disabled on the app shell.
-- Existing Library image-map, cover slide, arming/substitution engine and first-complete-sentence rule retained.
-- Visible development marker: v0.61.
-- Service-worker cache: nobonofo-0.61.
+0.61 failure identified:
+- The Search button markup was never inserted because the code looked for the wrong Contents close-button class.
+- The script then tried to attach an onclick handler to a nonexistent element, aborting JavaScript before shelf() ran.
+- A stray duplicated handler fragment also remained.
+- The Search result path referenced a nonexistent openChapter() function.
 
-NO ASSET CHANGES.
-UPLOAD FOUR ROOT FILES ONLY.
+0.62:
+- Search button is actually inserted into H2G2 Contents.
+- Handler is null-safe.
+- Broken duplicate fragment removed.
+- Search-result navigation uses the existing render()/show("reading") machinery.
+- Library image-map machinery retained.
+- iOS selection suppression retained.
+- Visible version marker: v0.62.
+- No assets changed.
+- Upload FOUR ROOT FILES ONLY.

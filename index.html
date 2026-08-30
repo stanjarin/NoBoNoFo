@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.61</title>
+<title>NoBo NoFo 0.62</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -129,7 +129,7 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.61</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.62</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -140,7 +140,7 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
   <div class="contents-head">
     <div id="cthumb" class="thumb"></div>
     <div id="ctitle" class="contents-title"></div>
-    <button class="close" id="closeContents">×</button>
+    <button id="contentsSearch" aria-label="Search"></button><button class="close" id="closeContents">×</button>
   </div>
   <div id="chapterList" class="contents-list"></div>
 </section>
@@ -295,26 +295,21 @@ $("#backContents").onclick=()=>openContents(state.book);
 $("#closeBook").onclick=()=>show("library");
 $("#closeContents").onclick=()=>show("library");
 
-$("#contentsSearch").onclick=(e)=>{
- e.preventDefault();
- e.stopPropagation();
- state.book="h2g2";
- $("#searchInput").value="";
- $("#searchResults").innerHTML="";
- show("search");
- setTimeout(()=>$("#searchInput").focus(),80);
-};
+const contentsSearch=$("#contentsSearch");
+if(contentsSearch){
+ contentsSearch.onclick=(e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  state.book="h2g2";
+  $("#searchInput").value="";
+  $("#searchResults").innerHTML="";
+  show("search");
+  setTimeout(()=>$("#searchInput").focus(),80);
+ };
+}
 
- $("#searchInput").value="";
- $("#searchResults").innerHTML="";
- show("search");
- setTimeout(()=>$("#searchInput").focus(),80);
-};
 $("#searchClose").onclick=()=>show("library");
 $("#searchBack").onclick=()=>openContents("h2g2");
-
-// Temporary H2G2 arming: long-press its cover -> fake search.
-let timer;
 
 $("#searchInput").addEventListener("keydown",e=>{
  if(e.key!=="Enter")return;
@@ -328,10 +323,12 @@ $("#searchInput").addEventListener("keydown",e=>{
    <button class="result" data-p="2"><b>Chapter 10</b><br>…an infinite improbability generator…</button>`;
  $("#searchResults").querySelectorAll(".result").forEach(bt=>bt.onclick=()=>{
    state.book="h2g2";
-   openChapter("h2g2",9);
+   state.chapter=3;
+   state.page=0;
+   render();
+   show("reading");
  });
 });
-$("#searchResults").onclick=()=>{state.book="h2g2";state.chapter=3;state.page=0;render();show("reading")};
 
 $("#reset").onclick=()=>{state.force="";localStorage.removeItem("nobonofoForceWord");debug()};
 shelf();debug();
