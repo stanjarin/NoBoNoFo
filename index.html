@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBo NoFo 0.66</title>
+<title>NoBo NoFo 0.67</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -198,37 +198,28 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 
 
 
-/* 0.66 reader search: small reader magnifier -> Books-style search overlay */
+/* 0.67 Contents base: Stanley-supplied full-width artwork.
+   The entire strip is one search trigger; 0.66 search behaviour is untouched. */
+#contents{padding-bottom:52px}
 .reader-search-dock{
   position:fixed;
-  right:18px;
-  bottom:18px;
-  width:48px;
-  height:48px;
+  left:0;
+  right:0;
+  bottom:0;
+  width:100%;
+  height:auto;
+  aspect-ratio:1237 / 155;
   border:0;
-  background:transparent;
+  background:transparent url("assets/CONTENTS_BASE.png") center bottom / 100% 100% no-repeat;
   z-index:80;
   padding:0;
+  margin:0;
+  border-radius:0;
+  -webkit-appearance:none;
+  appearance:none;
   -webkit-tap-highlight-color:transparent;
 }
-.reader-search-dock::before{
-  content:"";
-  position:absolute;
-  width:18px;height:18px;
-  border:4px solid #0a64d8;
-  border-radius:50%;
-  left:8px;top:7px;
-}
-.reader-search-dock::after{
-  content:"";
-  position:absolute;
-  width:16px;height:4px;
-  background:#0a64d8;
-  transform:rotate(45deg);
-  transform-origin:left center;
-  left:28px;top:29px;
-  border-radius:2px;
-}
+.reader-search-dock::before,.reader-search-dock::after{content:none}
 
 .search-overlay{
   position:fixed;
@@ -382,7 +373,7 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.66</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.67</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
