@@ -1,15 +1,16 @@
-# NoBoNoFo performance build 0.4
+# NoBoNoFo performance build 0.5
 
-FIRST REAL-ASSET BUILD
-- Stanley's finished LIBRARY.png is now the actual Library screen.
-- All nine finished covers are installed.
-- Transparent live hotspots align with the nine books in the Library artwork.
-- Tap a book -> full real cover -> tap cover -> live Contents -> chapter -> pages.
-- H2G2 long-press arming remains temporarily available directly from its Library cover.
-- Finished BOOK ICON.png is the PWA icon.
-- Existing force/substitution engine retained.
-- Locked socket rule retained: $$$ sentence is the first complete sentence on its page.
-- Ellipsis removed from the dummy carry-over fragment as requested.
-- Service-worker cache bumped to nobonofo-0.4.
+H2G2 ARMING PATH
+Library -> tap H2G2 -> full cover -> ~0.9 sec -> Contents -> Search -> type force word -> Return -> field changes to "improbability" + results -> tap result -> reader -> X -> Library, armed.
 
-Next: replace the temporary H2G2 long-press with the proper Cover -> Contents -> Search performance path.
+Also:
+- Cover now auto-transitions to Contents after ~0.9 sec; tap can accelerate.
+- Library artwork CSS is cropped/repositioned to remove its captured duplicate status-bar furniture.
+- Old H2G2 long-press arming kludge removed.
+- Existing substitution engine and first-complete-sentence socket rule retained.
+- Service-worker cache bumped to nobonofo-0.5.
+
+Still skeletal:
+- H2G2 Chapter 10 page is dummy reader text.
+- Search/results need final visual matching.
+- Real chapter prose not yet installed.
