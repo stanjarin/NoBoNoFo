@@ -1,20 +1,20 @@
-# NoBo NoFo performance build 0.62
+# NoBo NoFo performance build 0.63
 
-REPAIR BUILD
+SEARCH / ARMING REPAIR + REDESIGN
 
-0.61 failure identified:
-- The Search button markup was never inserted because the code looked for the wrong Contents close-button class.
-- The script then tried to attach an onclick handler to a nonexistent element, aborting JavaScript before shelf() ran.
-- A stray duplicated handler fragment also remained.
-- The Search result path referenced a nonexistent openChapter() function.
+Cause of 0.62 arming failure:
+- Search submit called `setForce(...)`, but `setForce` did not exist.
+- JavaScript therefore stopped at the moment Return was pressed.
 
-0.62:
-- Search button is actually inserted into H2G2 Contents.
-- Handler is null-safe.
-- Broken duplicate fragment removed.
-- Search-result navigation uses the existing render()/show("reading") machinery.
-- Library image-map machinery retained.
-- iOS selection suppression retained.
-- Visible version marker: v0.62.
+0.63:
+- Adds working `setForce()` persistence.
+- Search now uses a real form submit rather than relying on keydown/Enter.
+- iPhone keyboard Return is labelled Search via `enterkeyhint`.
+- On submit: covert word is stored -> field visibly becomes `improbability` -> keyboard dismisses -> plausible results appear.
+- Search screen redesigned as a compact, ordinary ebook-style search field/results list.
+- H2G2 result tap returns to the existing reader machinery.
+- Library/image-map, cover slide, selection suppression, first-complete-sentence rule all retained.
+- Visible marker: v0.63.
 - No assets changed.
-- Upload FOUR ROOT FILES ONLY.
+
+UPLOAD FOUR ROOT FILES ONLY.

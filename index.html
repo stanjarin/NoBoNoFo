@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBo NoFo 0.62</title>
+<title>NoBo NoFo 0.63</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -123,13 +123,85 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
   border-radius:2px;
 }
 
+
+#search{background:#fff}
+#search .toolbar{border-bottom:1px solid #e5e5e5}
+#searchForm.searchbox{
+  margin:0;
+  padding:18px 18px 0;
+  border:0;
+  background:#fff;
+}
+.searchfield{
+  position:relative;
+  height:44px;
+  border-radius:11px;
+  background:#f1f1f3;
+  display:flex;
+  align-items:center;
+}
+.searchglass{
+  width:15px;height:15px;
+  border:2px solid #777;
+  border-radius:50%;
+  margin-left:14px;
+  position:relative;
+  flex:0 0 auto;
+}
+.searchglass:after{
+  content:"";
+  position:absolute;
+  width:7px;height:2px;
+  background:#777;
+  right:-5px;bottom:-3px;
+  transform:rotate(45deg);
+  border-radius:1px;
+}
+#searchInput{
+  width:100%;
+  height:44px;
+  border:0;
+  outline:0;
+  background:transparent;
+  font:18px -apple-system,BlinkMacSystemFont,sans-serif;
+  padding:0 14px 0 10px;
+  color:#111;
+  -webkit-appearance:none;
+  appearance:none;
+}
+#searchInput::-webkit-search-cancel-button{display:none}
+#searchResults{
+  margin-top:14px;
+  border-top:1px solid #e6e6e6;
+}
+#searchResults:empty{border-top:0}
+#searchResults .result{
+  display:block;
+  width:100%;
+  text-align:left;
+  border:0;
+  border-bottom:1px solid #e6e6e6;
+  background:#fff;
+  padding:13px 2px 14px;
+  font:15px -apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.32;
+  color:#333;
+}
+#searchResults .result b{
+  display:block;
+  margin-bottom:3px;
+  font-size:13px;
+  font-weight:600;
+  color:#777;
+}
+
 </style>
 </head>
 <body>
 <section id="library" class="screen on real-library">
   <img src="assets/LIBRARY.png" class="library-art" alt="">
   <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
-  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.62</div>
+  <div id="debug" class="force-debug">FORCE: (none)</div><div class="version-tag">v0.63</div>
 </section>
 
 <section id="coverScreen" class="screen cover-screen">
@@ -159,10 +231,13 @@ html,body,.screen,.library-art,.library-hits,.library-hit{
 <section id="search" class="screen">
  <div class="reader">
   <div class="readerbar"><button class="iconbtn" id="searchBack">‹</button><div class="centre">Search</div><button class="iconbtn right" id="searchClose">×</button></div>
-  <div class="searchbox"><div class="searchpanel">
-   <input id="searchInput" placeholder="Search this book" autocomplete="off" spellcheck="false">
+  <form id="searchForm" class="searchbox" autocomplete="off">
+   <div class="searchfield">
+    <span class="searchglass" aria-hidden="true"></span>
+    <input id="searchInput" type="search" placeholder="Search this book" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="search">
+   </div>
    <div id="searchResults"></div>
-  </div></div>
+  </form>
  </div>
 </section>
 <button id="reset" aria-label="reset"></button>
@@ -215,6 +290,7 @@ let state={force:localStorage.getItem("nobonofoForceWord")||"",book:null,chapter
 let touchX=0;
 function show(id){screens.forEach(s=>s.classList.toggle("on",s.id===id));scrollTo(0,0)}
 function subst(t){return t.split("$$$").join(state.force||"$$$")}
+function setForce(w){state.force=w;localStorage.setItem("nobonofoForceWord",w);debug()}
 function debug(){$("#debug").textContent="FORCE: "+(state.force||"(none)")}
 function shelf(){
  const el=$("#libraryHits"); el.replaceChildren();
@@ -311,16 +387,18 @@ if(contentsSearch){
 $("#searchClose").onclick=()=>show("library");
 $("#searchBack").onclick=()=>openContents("h2g2");
 
-$("#searchInput").addEventListener("keydown",e=>{
- if(e.key!=="Enter")return;
- const w=e.target.value.trim();
+$("#searchForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const input=$("#searchInput");
+ const w=input.value.trim();
  if(!w)return;
  setForce(w);
- e.target.value="improbability";
+ input.value="improbability";
+ input.blur();
  $("#searchResults").innerHTML=`
-   <button class="result" data-p="0"><b>Chapter 10</b><br>…Infinite Improbability Drive… generating finite amounts of improbability…</button>
-   <button class="result" data-p="1"><b>Chapter 10</b><br>…the improbability factor rapidly reaches one to one…</button>
-   <button class="result" data-p="2"><b>Chapter 10</b><br>…an infinite improbability generator…</button>`;
+   <button type="button" class="result"><b>Chapter 10</b>…Infinite Improbability Drive… generating finite amounts of improbability…</button>
+   <button type="button" class="result"><b>Chapter 10</b>…the improbability factor rapidly reaches one to one…</button>
+   <button type="button" class="result"><b>Chapter 10</b>…an infinite improbability generator…</button>`;
  $("#searchResults").querySelectorAll(".result").forEach(bt=>bt.onclick=()=>{
    state.book="h2g2";
    state.chapter=3;
@@ -329,7 +407,6 @@ $("#searchInput").addEventListener("keydown",e=>{
    show("reading");
  });
 });
-
 $("#reset").onclick=()=>{state.force="";localStorage.removeItem("nobonofoForceWord");debug()};
 shelf();debug();
 })();
