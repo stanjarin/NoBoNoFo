@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>NoBoNoFo 0.33</title>
+<title>NoBoNoFo 0.4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
@@ -50,13 +50,26 @@ button{font:inherit;color:inherit}
 .searchresult b{display:block}
 .small{font-size:12px;color:#777}
 #reset{position:fixed;left:0;bottom:0;width:18px;height:18px;opacity:.02;border:0}
+
+.real-library{position:relative;width:100%;height:100vh;overflow:hidden;background:#fff}
+.library-art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
+.library-hits{position:absolute;left:4.7%;right:4.0%;top:18.0%;bottom:7.8%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);column-gap:3.6%;row-gap:1.5%}
+.library-hit{border:0;background:transparent;padding:0}
+.force-debug{display:none}
+.cover-screen{background:#fff;position:relative;height:100vh;overflow:hidden}
+.full-cover{width:100%;height:100%;object-fit:cover;display:block}
+
 </style>
 </head>
 <body>
-<section id="library" class="screen on library">
-  <h1>Library</h1><div class="debug">BUILD 0.33</div>
-  <div class="debug" id="debug">FORCE: (none)</div>
-  <div id="shelf" class="shelf"></div>
+<section id="library" class="screen on real-library">
+  <img src="assets/LIBRARY.png" class="library-art" alt="">
+  <div id="libraryHits" class="library-hits" aria-label="Library books"></div>
+  <div id="debug" class="force-debug">FORCE: (none)</div>
+</section>
+
+<section id="coverScreen" class="screen cover-screen">
+  <img id="fullCover" class="full-cover" alt="">
 </section>
 
 <section id="contents" class="screen">
@@ -112,6 +125,12 @@ const titles=[
 ["huck","Adventures of Huckleberry Finn","Mark Twain","#b7a47c"]
 ];
 const BOOKS={};
+const ASSET={
+  jeeves:"JEEVES.png", sot:"SOTWEED.png", arms:"ERNEST.png",
+  life:"KEEF.png", guitar:"BLOOMERS.png", h2g2:"H2G2.png",
+  campaign:"HST.png", huck:"HUCK.png", jobs:"JOBS.png"
+};
+const LIBRARY_ORDER=["jeeves","sot","arms","life","guitar","h2g2","campaign","huck","jobs"];
 titles.forEach((x,bi)=>{
  const chapters=[];
  for(let c=1;c<=8;c++){
@@ -121,7 +140,7 @@ titles.forEach((x,bi)=>{
      // LOCKED SOCKET RULE:
      // $$$ must occur in the FIRST COMPLETE sentence on any armed page.
      // A carried-over sentence tail may precede it for the "No, the first complete sentence" beat.
-     paras[0] = "…isn’t what she thought. It was $$$.";
+     paras[0] = "isn’t what she thought. It was $$$.";
      pages.push(paras);
    }
    chapters.push({id:c,title:`Chapter ${c}${c===3?": The Good Bit":""}`,start:6+(c-1)*27,pages});
@@ -134,17 +153,24 @@ function show(id){screens.forEach(s=>s.classList.toggle("on",s.id===id));scrollT
 function subst(t){return t.split("$$$").join(state.force||"$$$")}
 function debug(){$("#debug").textContent="FORCE: "+(state.force||"(none)")}
 function shelf(){
- const el=$("#shelf"); el.replaceChildren();
- Object.values(BOOKS).forEach(b=>{
-  const bt=document.createElement("button");bt.className="book";
-  bt.innerHTML=`<div class="cover" style="background:${b.colour};color:${b.id==="h2g2"||b.id==="life"?"white":"#111"}"><strong>${b.title}</strong><span>${b.author}</span></div><div class="label">${b.title}</div>`;
-  bt.onclick=()=>openContents(b.id); el.append(bt);
+ const el=$("#libraryHits"); el.replaceChildren();
+ LIBRARY_ORDER.forEach(id=>{
+   const bt=document.createElement("button"); bt.className="library-hit"; bt.dataset.book=id;
+   bt.setAttribute("aria-label",BOOKS[id].title);
+   bt.onclick=()=>openCover(id);
+   el.append(bt);
  });
 }
+function openCover(id){
+ state.book=id;
+ $("#fullCover").src="assets/"+ASSET[id];
+ show("coverScreen");
+}
+$("#fullCover").onclick=()=>openContents(state.book);
 function openContents(id){
  state.book=id; const b=BOOKS[id];
- $("#ctitle").textContent=b.title; $("#cthumb").textContent=b.title;
- $("#cthumb").style.background=b.colour;
+ $("#ctitle").textContent=b.title; $("#cthumb").textContent="";
+ $("#cthumb").style.background=`url("assets/${ASSET[id]}") center/cover no-repeat`;
  const list=$("#chapterList"); list.replaceChildren();
  b.chapters.forEach(ch=>{
   const r=document.createElement("button");r.className="chapterrow";
@@ -175,13 +201,11 @@ $("#searchBack").onclick=()=>openContents("h2g2");
 
 // Temporary H2G2 arming: long-press its cover -> fake search.
 let timer;
-$("#shelf").addEventListener("touchstart",e=>{
- const bt=e.target.closest(".book"); if(!bt)return;
- const all=[...$("#shelf").children], idx=all.indexOf(bt);
- if(idx!==0)return;
+$("#libraryHits").addEventListener("touchstart",e=>{
+ const bt=e.target.closest(".library-hit"); if(!bt || bt.dataset.book!=="h2g2")return;
  timer=setTimeout(()=>{state.book="h2g2";$("#searchInput").value="";$("#searchResults").innerHTML="";show("search");$("#searchInput").focus()},550);
 },{passive:true});
-$("#shelf").addEventListener("touchend",()=>clearTimeout(timer),{passive:true});
+$("#libraryHits").addEventListener("touchend",()=>clearTimeout(timer),{passive:true});
 
 $("#searchInput").addEventListener("keydown",e=>{
  if(e.key!=="Enter")return;
