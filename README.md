@@ -1,40 +1,34 @@
-# NoBo NoFo performance build 0.70
+# NoBo NoFo performance build 0.72
 
-HUCK FINN REAL-TEXT PASS
+0.72 adds the first complete performance-state architecture to the working 0.71 build.
 
-0.70 preserves the working 0.67 shell, Contents base, search/arming behaviour and assets.
+## H2G2 — two states
+- ARMING route: H2G2 Search accepts the covert force word, then visibly becomes `improbability` and shows the three search results.
+- Tapping a result now opens genuine Chapter 10 Infinite Improbability Drive text (pages 62–64 in the performance reader), not the H2G2 force chapter.
+- Closing that Chapter 10 reading page returns to Library and H2G2 thereafter behaves like an ordinary Force book.
+- RESET returns H2G2 to ARMING state.
 
-- Replaces dummy text in Huckleberry Finn with real Chapter III source text.
-- Five reading pages use the locked 13/16 serif reader typography.
-- Each reachable Huck page contains one $$$ socket in its first complete sentence.
-- Follower pages use a carried-over sentence fragment where useful.
-- All Huck chapter choices route to the same five-page Chapter III master while retaining the chosen superficial chapter number.
-- Huck Contents page starts use genuine-looking source page numbers: 17, 22, 28, 32, 36, 41, 48, 54.
-- No assets changed.
-- Search behaviour remains exactly as in 0.67, including the currently retained universal Contents-search/arming capability.
-- Service-worker cache: `nobonofo-0.70`.
-- Visible version marker: v0.70.
+## Performance states
+- READY — pristine text; no force word active.
+- ARMED — all $$$ sockets render the force word.
+- PAID — exactly the selected payoff page retains the force word; every other socket renders clean text.
+
+## PAID trigger
+After the payoff has happened, press and hold the small bottom-right page-menu symbol (☷) for about 0.9 seconds while still on the payoff page. That exact book/chapter/page is retained as the sole Gopher page and the rest of the library is cleaned. A short vibration acknowledges the trigger when supported.
+
+## RESET
+The existing near-invisible bottom-left reset hotspot now performs a full manual reset: clears force word and PAID page, restores pristine text, restores H2G2 ARMING state, and returns to Library.
+
+Session state is stored locally so the PAID evidence survives ordinary navigation/reopening until RESET.
 
 ## GitHub upload
 Replace these FOUR ROOT FILES only:
-
 - `index.html`
 - `manifest.webmanifest`
 - `sw.js`
 - `README.md`
 
-No assets need uploading.
+No assets changed.
 
-
-## 0.69
-- Real-text master environments added for all nine shelf books.
-- Huck III retained from 0.68.
-- Life uses the authentic page-525 bangers-and-mash recipe excerpt as its current compact source environment.
-- Full horizontal page-slide transition added for reader orientation.
-- Search/arming behaviour unchanged from 0.67/0.68.
-
-## 0.70
-- Rebuilt Keith Richards / Life environment from Apple Books pp. 92–96 supplied by Stanley.
-- Five Keef pages now use broad early-music/guitar/Scouting prose instead of the bangers-only environment.
-- Each landing page is engineered so the $$$ socket is in the first complete sentence after an optional carry-over fragment.
-- No assets changed.
+Service-worker cache: `nobonofo-0.72`.
+Visible version marker: v0.72.
