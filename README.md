@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 3 Nine-Book Reader v1
+# NoBo NoFo — PASS 4.2H NoBo Engine Test
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -88,3 +88,9 @@ Fix:
 - Temporary Library-only `RESET TEST` button for repeat testing without keyboard shortcuts.
 - Temporary visible Library state marker: `STATE: READY / ARMED / PAID / CLEAN`.
 - No book JSON changed. Do NOT upload `/books`.
+
+## Pass 4.2H
+- Explicit one-time READY initialization under a new session key.
+- H2G2 shows SEARCH only in READY.
+- Corrected stale README title.
+- Books unchanged.

@@ -47,7 +47,10 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
-const MAGICKEY="nobonofo-magic-pass42g";
+const MAGICKEY="nobonofo-magic-pass42h";
+if(sessionStorage.getItem(MAGICKEY)===null){
+  sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
+}
 const magic=Object.assign({phase:"READY",force:"",paid:null,dwell:null},JSON.parse(sessionStorage.getItem(MAGICKEY)||"{}"));
 function saveMagic(){sessionStorage.setItem(MAGICKEY,JSON.stringify(magic))}
 function resetMagic(){Object.assign(magic,{phase:"READY",force:"",paid:null,dwell:null});saveMagic();goLibrary()}
@@ -156,7 +159,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2G reader · <small>STATE: ${esc(magic.phase)}</small></div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2H reader · <small>STATE: ${esc(magic.phase)}</small></div>
       <button id="resetTest">RESET TEST</button>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
