@@ -41,6 +41,45 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
+const MAGICKEY="nobonofo-magic-v1";
+const magic=Object.assign({phase:"READY",force:"",paid:null,dwell:null},JSON.parse(sessionStorage.getItem(MAGICKEY)||"{}"));
+function saveMagic(){sessionStorage.setItem(MAGICKEY,JSON.stringify(magic))}
+function resetMagic(){Object.assign(magic,{phase:"READY",force:"",paid:null,dwell:null});saveMagic();goLibrary()}
+function cleanMagic(){if(magic.phase==="PAID"){magic.phase="CLEAN";magic.force="";saveMagic();render()}}
+function armMagic(word){
+  word=String(word||"").trim();
+  if(!word)return;
+  magic.phase="ARMED";magic.force=word;magic.paid=null;magic.dwell=null;saveMagic();
+}
+function pageKey(){return state.book?`${state.book.id}:${state.ci}:${state.pi}`:""}
+function firstSentenceInject(text,word){
+  if(!word)return text;
+  if(text.includes("$$$"))return text.replaceAll("$$$",word);
+  // Corpus currently has no prepared sockets. Pass 4 therefore leaves genuine prose untouched
+  // unless a $$$ socket is deliberately present; no destructive automatic word replacement.
+  return text;
+}
+function visibleParagraphs(p){
+  const k=pageKey(),forceHere=magic.phase==="ARMED" || (magic.phase==="PAID"&&magic.paid===k);
+  return p.paragraphs.map(x=>forceHere?firstSentenceInject(x,magic.force):x);
+}
+function beginDwell(){
+  clearTimeout(magic._timer);
+  if(magic.phase!=="ARMED")return;
+  const k=pageKey();
+  magic.dwell={key:k,qualified:false};
+  magic._timer=setTimeout(()=>{
+    if(magic.phase==="ARMED"&&pageKey()===k&&magic.dwell?.key===k){
+      magic.dwell.qualified=true; saveMagic();
+    }
+  },2200);
+}
+function maybeAutoPaid(departingKey){
+  if(magic.phase==="ARMED"&&magic.dwell?.qualified&&magic.dwell.key===departingKey){
+    magic.phase="PAID";magic.paid=departingKey;magic.dwell=null;saveMagic();
+  }
+}
+
 async function init(){
   state.meta=await (await fetch("books/index.json",{cache:"no-store"})).json();
   render();
@@ -67,15 +106,17 @@ function goLibrary(){state.screen="library";state.book=null;state.edit=false;ren
 async function openBook(id){state.book=await loadBook(id);state.screen="contents";state.ci=0;state.pi=0;render()}
 function openChapter(i){state.ci=i;state.pi=0;state.screen="reader";render()}
 function pageMove(d){
+  const departing=pageKey();
   let ci=state.ci,pi=state.pi+d;
   if(pi<0){if(ci===0)return;ci--;pi=state.book.chapters[ci].pages.length-1}
   if(pi>=state.book.chapters[ci].pages.length){if(ci===state.book.chapters.length-1)return;ci++;pi=0}
+  maybeAutoPaid(departing);
   state.ci=ci;state.pi=pi;render();
 }
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 3 reader</div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4 reader</div>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
     document.querySelectorAll(".book").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
@@ -91,12 +132,13 @@ function render(){
   }
   const p=currentPage(),ch=state.book.chapters[state.ci];
   app.innerHTML=`<div class="top"><button id="contents">CONTENTS</button><div class="title">${esc(state.book.title)} · ${esc(ch.title)}</div><button id="edit">EDIT</button></div>
-    <div class="reader"><div class="page">${p.opener?`<h1>${esc(ch.title)}</h1>`:""}${p.paragraphs.map(x=>`<p>${esc(x)}</p>`).join("")}</div>
+    <div class="reader"><div class="page">${p.opener?`<h1>${esc(ch.title)}</h1>`:""}${visibleParagraphs(p).map(x=>`<p>${esc(x)}</p>`).join("")}</div>
     <div class="hit left" id="left"></div><div class="hit right" id="right"></div>
     <div class="pageno">${absolutePage()} / ${totalBookPages()}</div></div>`;
   $("#contents").onclick=()=>{state.screen="contents";render()};
   $("#left").onclick=()=>pageMove(-1);$("#right").onclick=()=>pageMove(1);
   $("#edit").onclick=openEditor;
+  beginDwell();
 }
 function openEditor(){
   const p=currentPage(),ch=state.book.chapters[state.ci],app=$("#app");
@@ -109,36 +151,14 @@ function openEditor(){
   $("#cancelEdit").onclick=()=>overlay.remove();
   $("#saveEdit").onclick=()=>saveEdit(false);
   $("#repag").onclick=()=>saveEdit(true);
-  $("#exportEdit").onclick=()=>{commitEditorFields();exportBook()};
-
-  // iPhone "Done" may only dismiss the keyboard.  Do not depend on a button press:
-  // commit every edit locally as it happens, and again whenever either field blurs.
-  let autosaveTimer=null;
-  const autosave=()=>{
-    clearTimeout(autosaveTimer);
-    autosaveTimer=setTimeout(()=>{
-      commitEditorFields();
-      const d=overlay.querySelector(".dirty");
-      if(d)d.textContent="saved";
-    },120);
-  };
-  $("#pageText").addEventListener("input",autosave);
-  $("#heading").addEventListener("input",autosave);
-  $("#pageText").addEventListener("blur",()=>{commitEditorFields();});
-  $("#heading").addEventListener("blur",()=>{commitEditorFields();});
-}
-function commitEditorFields(){
-  const heading=$("#heading"), text=$("#pageText");
-  if(!heading || !text || !state.book)return;
-  const ch=state.book.chapters[state.ci],p=currentPage();
-  ch.title=heading.value.trim()||ch.title;
-  p.paragraphs=text.value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-  p.word_count=p.paragraphs.join(" ").trim().split(/\s+/).filter(Boolean).length;
-  state.dirty.add(state.ci);
-  saveLocal();
+  $("#exportEdit").onclick=exportBook;
 }
 function saveEdit(repaginate){
-  commitEditorFields();
+  const ch=state.book.chapters[state.ci],p=currentPage();
+  ch.title=$("#heading").value.trim()||ch.title;
+  p.paragraphs=$("#pageText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+  p.word_count=p.paragraphs.join(" ").trim().split(/\s+/).filter(Boolean).length;
+  state.dirty.add(state.ci);
   if(repaginate) repaginateChapter(state.ci);
   saveLocal();render();
 }
@@ -177,6 +197,12 @@ async function importBook(ev){
   }catch(e){alert("Import failed: "+e.message)}
   ev.target.value="";
 }
-document.addEventListener("keydown",e=>{if(state.screen==="reader"&&!document.querySelector(".editor")){if(e.key==="ArrowLeft")pageMove(-1);if(e.key==="ArrowRight")pageMove(1)}})
+document.addEventListener("keydown",e=>{
+  if(document.querySelector(".editor"))return;
+  if(state.screen==="reader"){if(e.key==="ArrowLeft")pageMove(-1);if(e.key==="ArrowRight")pageMove(1)}
+  if(e.key==="F"){const w=prompt("Force word",magic.force||"");if(w)armMagic(w)}
+  if(e.key==="C")cleanMagic();
+  if(e.key==="R"&&confirm("Reset NoBo session to READY?"))resetMagic();
+})
 init().catch(e=>document.body.innerHTML="<pre>"+esc(e.stack||e)+"</pre>");
 </script></body></html>

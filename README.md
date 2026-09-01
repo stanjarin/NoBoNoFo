@@ -26,9 +26,29 @@ Not in this pass:
 
 PASS 4 restores READY → ARMED → AUTO-PAID/PAID → CLEAN on top of this reader.
 
-## Pass 3 editor fix
-- Editorial text and heading changes now autosave locally while typing.
-- Blur/keyboard dismissal commits again.
-- SAVE PAGE remains as an explicit belt-and-braces control.
-- REPAGINATE CHAPTER remains deliberate; autosave does not silently repaginate.
-- Service-worker cache bumped to `nobonofo-pass3-done-save-v2`.
+## Pass 4 — magic engine v1
+
+Implemented state foundation:
+
+- READY -> ARMED -> AUTO-PAID/PAID -> CLEAN
+- RESET -> READY
+- Session state is held in `sessionStorage`, so ordinary in-session navigation preserves it.
+- ARMED pages resolve deliberately prepared `$$$` sockets to the force word.
+- A landing page qualifies after 2.2 seconds stationary dwell.
+- The next page move changes ARMED to PAID and records the departed payoff page.
+- In PAID, only that recorded payoff page remains eligible to resolve its socket.
+- CLEAN deliberately purges the force word; it never happens automatically.
+- RESET deliberately returns to READY.
+- No corpus prose is automatically rewritten: only explicit `$$$` sockets are substituted.
+- Editorial mode remains manual SAVE PAGE.
+
+Temporary desktop test controls (not intended as final performance UI):
+- `F` — arm a force word.
+- `C` — CLEAN, when PAID.
+- `R` — RESET to READY.
+
+Still to integrate in Pass 4 before approval:
+- H2G2 ARMING Search route and visible “improbability” camouflage.
+- Prepared author-specific `$$$` payoff grafts/sockets in the corpus.
+- Touch/covert iPhone arming gesture replacing the temporary desktop `F` test control.
+- Full iPhone state-transition torture test.
