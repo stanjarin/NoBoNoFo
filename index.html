@@ -124,34 +124,39 @@ function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
   ov.innerHTML=`<div class="top"><button id="sx">CANCEL</button><div class="title"><b>Search</b></div></div>
-    <div class="searchbar"><input id="secretSearch" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" placeholder="Search this book"></div>
+    <form id="searchForm" class="searchbar">
+      <input id="secretSearch" autocomplete="off" autocapitalize="none" spellcheck="false"
+             enterkeyhint="search" placeholder="Search this book">
+    </form>
     <div id="results"></div>`;
   app.appendChild(ov);
   const inp=$("#secretSearch"),res=$("#results");
-  inp.focus();
-  inp.addEventListener("input",()=>{
-    // Preserve covert payload separately; spectator-facing field always reads "improbability".
-    inp.dataset.payload=inp.value;
-    if(inp.value) inp.value="improbability";
-  });
-  const submit=()=>{
-    let w=(inp.dataset.payload||"").trim();
-    // If iOS input events yielded the masked display only, do not arm garbage.
-    if(!w || w==="improbability")return;
+
+  function submit(){
+    const w=inp.value.trim();
+    if(!w || w.toLowerCase()==="improbability")return;
     armMagic(w);
+    // ONE state change: the same Search/Done action that commits the covert word
+    // transforms the visible field and produces the innocent results.
     inp.value="improbability";
+    inp.blur();
     res.innerHTML=`<button class="result" id="improbResult"><b>Infinite Improbability Drive</b><small>Chapter 10 · “…the principle of generating finite amounts of improbability…”</small></button>
       <button class="result"><b>improbability</b><small>More matches in this book</small></button>`;
-    $("#improbResult").onclick=()=>{ov.remove();state.ci=Math.min(9,state.book.chapters.length-1);state.pi=0;state.screen="reader";render()};
-  };
-  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();submit()}});
-  inp.addEventListener("search",submit);
+    $("#improbResult").onclick=()=>{
+      ov.remove();
+      state.ci=Math.min(9,state.book.chapters.length-1);
+      state.pi=0;state.screen="reader";render();
+    };
+  }
+
+  $("#searchForm").addEventListener("submit",e=>{e.preventDefault();submit()});
   $("#sx").onclick=()=>ov.remove();
+  inp.focus();
 }
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2C reader</div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2E reader</div>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
     document.querySelectorAll(".book").forEach(b=>b.onclick=()=>openBook(b.dataset.id));

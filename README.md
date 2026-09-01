@@ -66,3 +66,10 @@ Still to integrate in Pass 4 before approval:
 ## Pass 4.2C cache fix
 Immediate SW activation; old NoBo caches deleted; app HTML/book JSON network-first.
 Visible marker: Pass 4.2C reader.
+
+## Pass 4.2E — approved Search/Done choreography
+- While the phone is concealed, the Search field shows the complete real covert input and can be corrected normally.
+- The iPhone keyboard Search/Done action is the single state-change trigger.
+- That same action arms the real word, changes the visible field to `improbability`, dismisses the keyboard, and produces plausible search results.
+- No first-keystroke masking.
+- Visible marker: `Pass 4.2E reader`.
