@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.2I Swipe Navigation Fix
+# NoBo NoFo — PASS 4.2J Socket Leakage Fix
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -100,4 +100,11 @@ Fix:
 - Left/right tap zones retained.
 - SEARCH/arming and magic-state logic otherwise unchanged.
 - New test-session key and cache identity.
+- Books unchanged.
+
+## Pass 4.2J
+- Inactive temporary `$$$` sockets are suppressed instead of leaking visibly.
+- ARMED substitution unchanged.
+- PAID retains force only on exact payoff page.
+- Swipe navigation retained.
 - Books unchanged.

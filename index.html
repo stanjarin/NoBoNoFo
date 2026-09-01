@@ -47,7 +47,7 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
-const MAGICKEY="nobonofo-magic-pass42i";
+const MAGICKEY="nobonofo-magic-pass42j";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -70,7 +70,11 @@ function firstSentenceInject(text,word){
 }
 function visibleParagraphs(p){
   const k=pageKey(),forceHere=magic.phase==="ARMED" || (magic.phase==="PAID"&&magic.paid===k);
-  return p.paragraphs.map(x=>forceHere?firstSentenceInject(x,magic.force):x);
+  return p.paragraphs.map(x=>{
+    if(forceHere) return firstSentenceInject(x,magic.force);
+    // Temporary engine-test sockets are invisible whenever they are inactive.
+    return x.replaceAll("$$$","");
+  });
 }
 function beginDwell(){
   clearTimeout(magic._timer);
@@ -159,7 +163,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2I reader · <small>STATE: ${esc(magic.phase)}</small></div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2J reader · <small>STATE: ${esc(magic.phase)}</small></div>
       <button id="resetTest">RESET TEST</button>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
