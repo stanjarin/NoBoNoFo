@@ -77,3 +77,14 @@ Visible marker: Pass 4.2C reader.
 ## Pass 4.2F — input interception fix
 Removed temporary global desktop C/R diagnostic shortcuts. They could fire while typing into H2G2 Search (R invoked RESET). Search input is now left alone until keyboard Search/Done submits it.
 Visible marker: Pass 4.2F reader.
+
+## Pass 4.2G — stale magic-state fix
+Root cause found: Pass 4.2 builds all reused `nobonofo-magic-v1` in sessionStorage.
+If an earlier build had reached ARMED, deploying/refeshing a newer build correctly preserved that ARMED state,
+so H2G2 showed EXPORT instead of READY-only SEARCH.
+
+Fix:
+- Fresh development magic-state key: `nobonofo-magic-pass42g`, so this build starts READY.
+- Temporary Library-only `RESET TEST` button for repeat testing without keyboard shortcuts.
+- Temporary visible Library state marker: `STATE: READY / ARMED / PAID / CLEAN`.
+- No book JSON changed. Do NOT upload `/books`.
