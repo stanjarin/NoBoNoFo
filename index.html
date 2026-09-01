@@ -151,7 +151,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2 reader</div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2C reader</div>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
     document.querySelectorAll(".book").forEach(b=>b.onclick=()=>openBook(b.dataset.id));

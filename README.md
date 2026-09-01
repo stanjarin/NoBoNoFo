@@ -62,3 +62,7 @@ Still to integrate in Pass 4 before approval:
 - These `$$$` test pages are NOT final prose grafts and will be replaced.
 - 2.2-second dwell then next page move triggers PAID; returning to the payoff page retains the force.
 - CLEAN remains deliberately non-automatic. Final covert CLEAN gesture is still pending.
+
+## Pass 4.2C cache fix
+Immediate SW activation; old NoBo caches deleted; app HTML/book JSON network-first.
+Visible marker: Pass 4.2C reader.
