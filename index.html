@@ -47,7 +47,7 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
-const MAGICKEY="nobonofo-magic-pass42h";
+const MAGICKEY="nobonofo-magic-pass42i";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -159,7 +159,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2H reader · <small>STATE: ${esc(magic.phase)}</small></div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2I reader · <small>STATE: ${esc(magic.phase)}</small></div>
       <button id="resetTest">RESET TEST</button>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
@@ -184,6 +184,24 @@ function render(){
     <div class="pageno">${absolutePage()} / ${totalBookPages()}</div></div>`;
   $("#contents").onclick=()=>{state.screen="contents";render()};
   $("#left").onclick=()=>pageMove(-1);$("#right").onclick=()=>pageMove(1);
+
+  // iPhone horizontal flick navigation.
+  const reader=document.querySelector(".reader");
+  let touchX=null,touchY=null;
+  reader.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1)return;
+    touchX=e.touches[0].clientX; touchY=e.touches[0].clientY;
+  },{passive:true});
+  reader.addEventListener("touchend",e=>{
+    if(touchX===null || !e.changedTouches.length)return;
+    const dx=e.changedTouches[0].clientX-touchX;
+    const dy=e.changedTouches[0].clientY-touchY;
+    touchX=touchY=null;
+    if(Math.abs(dx)>=45 && Math.abs(dx)>Math.abs(dy)*1.25){
+      pageMove(dx<0 ? 1 : -1);
+    }
+  },{passive:true});
+
   $("#edit").onclick=openEditor;
   beginDwell();
 }

@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.2H NoBo Engine Test
+# NoBo NoFo — PASS 4.2I Swipe Navigation Fix
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -93,4 +93,11 @@ Fix:
 - Explicit one-time READY initialization under a new session key.
 - H2G2 shows SEARCH only in READY.
 - Corrected stale README title.
+- Books unchanged.
+
+## Pass 4.2I
+- Restored real iPhone horizontal flick navigation in reader pages.
+- Left/right tap zones retained.
+- SEARCH/arming and magic-state logic otherwise unchanged.
+- New test-session key and cache identity.
 - Books unchanged.
