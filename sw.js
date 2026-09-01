@@ -1,5 +1,4 @@
-const CACHE="nobonofo-0.74-iconfix";
-const FILES=["./", "./index.html", "./manifest.webmanifest", "./assets/BLOOMERS.png", "./assets/NOBO_ICON.png", "./assets/ERNEST.png", "./assets/H2G2.png", "./assets/HST.png", "./assets/HUCK.png", "./assets/JEEVES.png", "./assets/JOBS.png", "./assets/KEEF.png", "./assets/LIBRARY.png", "./assets/SOTWEED.png", "./assets/CONTENTS_BASE.png"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+const CACHE="nobonofo-pass3-v1";const FILES=["./", "index.html", "manifest.webmanifest", "books/index.json", "books/jeeves.json", "books/jobs.json", "books/sotweed.json", "books/farewell.json", "books/bloomfield.json", "books/h2g2.json", "books/huck.json", "books/hst.json", "books/keef.json"];
+self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
+self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x))))));
 self.addEventListener("fetch",e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
