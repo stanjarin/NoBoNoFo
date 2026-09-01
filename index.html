@@ -109,14 +109,36 @@ function openEditor(){
   $("#cancelEdit").onclick=()=>overlay.remove();
   $("#saveEdit").onclick=()=>saveEdit(false);
   $("#repag").onclick=()=>saveEdit(true);
-  $("#exportEdit").onclick=exportBook;
+  $("#exportEdit").onclick=()=>{commitEditorFields();exportBook()};
+
+  // iPhone "Done" may only dismiss the keyboard.  Do not depend on a button press:
+  // commit every edit locally as it happens, and again whenever either field blurs.
+  let autosaveTimer=null;
+  const autosave=()=>{
+    clearTimeout(autosaveTimer);
+    autosaveTimer=setTimeout(()=>{
+      commitEditorFields();
+      const d=overlay.querySelector(".dirty");
+      if(d)d.textContent="saved";
+    },120);
+  };
+  $("#pageText").addEventListener("input",autosave);
+  $("#heading").addEventListener("input",autosave);
+  $("#pageText").addEventListener("blur",()=>{commitEditorFields();});
+  $("#heading").addEventListener("blur",()=>{commitEditorFields();});
 }
-function saveEdit(repaginate){
+function commitEditorFields(){
+  const heading=$("#heading"), text=$("#pageText");
+  if(!heading || !text || !state.book)return;
   const ch=state.book.chapters[state.ci],p=currentPage();
-  ch.title=$("#heading").value.trim()||ch.title;
-  p.paragraphs=$("#pageText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+  ch.title=heading.value.trim()||ch.title;
+  p.paragraphs=text.value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
   p.word_count=p.paragraphs.join(" ").trim().split(/\s+/).filter(Boolean).length;
   state.dirty.add(state.ci);
+  saveLocal();
+}
+function saveEdit(repaginate){
+  commitEditorFields();
   if(repaginate) repaginateChapter(state.ci);
   saveLocal();render();
 }
