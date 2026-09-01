@@ -73,3 +73,7 @@ Visible marker: Pass 4.2C reader.
 - That same action arms the real word, changes the visible field to `improbability`, dismisses the keyboard, and produces plausible search results.
 - No first-keystroke masking.
 - Visible marker: `Pass 4.2E reader`.
+
+## Pass 4.2F — input interception fix
+Removed temporary global desktop C/R diagnostic shortcuts. They could fire while typing into H2G2 Search (R invoked RESET). Search input is now left alone until keyboard Search/Done submits it.
+Visible marker: Pass 4.2F reader.
