@@ -52,3 +52,13 @@ Still to integrate in Pass 4 before approval:
 - Prepared author-specific `$$$` payoff grafts/sockets in the corpus.
 - Touch/covert iPhone arming gesture replacing the temporary desktop `F` test control.
 - Full iPhone state-transition torture test.
+
+## Pass 4.2 — iPhone arming test
+- H2G2 Contents shows SEARCH only while READY.
+- Search accepts covert typed payload while visibly displaying `improbability`.
+- Search/Return arms the payload and shows an Infinite Improbability result.
+- Opening that result enters H2G2 reader; returning to Library leaves the session ARMED.
+- Each book has one temporary `$$$` test socket on Chapter 1 / Page 1 so the full state engine can now be tested on iPhone.
+- These `$$$` test pages are NOT final prose grafts and will be replaced.
+- 2.2-second dwell then next page move triggers PAID; returning to the payoff page retains the force.
+- CLEAN remains deliberately non-automatic. Final covert CLEAN gesture is still pending.

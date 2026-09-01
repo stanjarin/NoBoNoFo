@@ -31,6 +31,12 @@ button,input,textarea{font:inherit} button{cursor:pointer}
 .hidden{display:none!important}
 #fileInput{display:none}
 @media(max-width:650px){.library{gap:8px;padding:10px}.book{min-height:125px;padding:9px}.book h2{font-size:14px}.page{padding:28px 22px 58px}.page p{font-size:16px}}
+
+.searchOverlay{position:fixed;inset:0;background:#f6f2e9;z-index:40;padding:18px;color:#222}
+.searchOverlay .searchbar{display:flex;gap:8px;margin:12px 0}
+.searchOverlay input{flex:1;font-size:18px;padding:11px;border:1px solid #aaa;border-radius:8px;background:white}
+.searchOverlay .result{display:block;width:100%;text-align:left;padding:15px 4px;border:0;border-bottom:1px solid #ccc;background:none}
+.searchOverlay .result b{display:block;font-size:17px}.searchOverlay .result small{display:block;margin-top:5px;color:#666}
 </style>
 </head>
 <body><div id="app"></div>
@@ -113,10 +119,39 @@ function pageMove(d){
   maybeAutoPaid(departing);
   state.ci=ci;state.pi=pi;render();
 }
+
+function openH2G2Search(){
+  if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
+  const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
+  ov.innerHTML=`<div class="top"><button id="sx">CANCEL</button><div class="title"><b>Search</b></div></div>
+    <div class="searchbar"><input id="secretSearch" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" placeholder="Search this book"></div>
+    <div id="results"></div>`;
+  app.appendChild(ov);
+  const inp=$("#secretSearch"),res=$("#results");
+  inp.focus();
+  inp.addEventListener("input",()=>{
+    // Preserve covert payload separately; spectator-facing field always reads "improbability".
+    inp.dataset.payload=inp.value;
+    if(inp.value) inp.value="improbability";
+  });
+  const submit=()=>{
+    let w=(inp.dataset.payload||"").trim();
+    // If iOS input events yielded the masked display only, do not arm garbage.
+    if(!w || w==="improbability")return;
+    armMagic(w);
+    inp.value="improbability";
+    res.innerHTML=`<button class="result" id="improbResult"><b>Infinite Improbability Drive</b><small>Chapter 10 · “…the principle of generating finite amounts of improbability…”</small></button>
+      <button class="result"><b>improbability</b><small>More matches in this book</small></button>`;
+    $("#improbResult").onclick=()=>{ov.remove();state.ci=Math.min(9,state.book.chapters.length-1);state.pi=0;state.screen="reader";render()};
+  };
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();submit()}});
+  inp.addEventListener("search",submit);
+  $("#sx").onclick=()=>ov.remove();
+}
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4 reader</div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.2 reader</div>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
     document.querySelectorAll(".book").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
@@ -124,9 +159,11 @@ function render(){
     return;
   }
   if(state.screen==="contents"){
-    app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b> — ${esc(state.book.author)}</div><button id="export">EXPORT</button></div>
+    app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b> — ${esc(state.book.author)}</div>${state.book.id==="h2g2"&&magic.phase==="READY"?'<button id="searchBook">SEARCH</button>':'<button id="export">EXPORT</button>'}</div>
       <div class="contents"><h1>Contents</h1>${state.book.chapters.map((c,i)=>`<button class="chapter" data-i="${i}">${esc(c.title)} <small>(${c.pages.length} pages)</small></button>`).join("")}</div>`;
-    $("#back").onclick=goLibrary; $("#export").onclick=exportBook;
+    $("#back").onclick=goLibrary;
+    if($("#export"))$("#export").onclick=exportBook;
+    if($("#searchBook"))$("#searchBook").onclick=openH2G2Search;
     document.querySelectorAll(".chapter").forEach(b=>b.onclick=()=>openChapter(+b.dataset.i));
     return;
   }
@@ -200,7 +237,6 @@ async function importBook(ev){
 document.addEventListener("keydown",e=>{
   if(document.querySelector(".editor"))return;
   if(state.screen==="reader"){if(e.key==="ArrowLeft")pageMove(-1);if(e.key==="ArrowRight")pageMove(1)}
-  if(e.key==="F"){const w=prompt("Force word",magic.force||"");if(w)armMagic(w)}
   if(e.key==="C")cleanMagic();
   if(e.key==="R"&&confirm("Reset NoBo session to READY?"))resetMagic();
 })
