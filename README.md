@@ -1,8 +1,12 @@
-# NoBo NoFo — v.5J
+# NoBo NoFo — v.5K
 
-BLOCKER FIX ONLY:
-- H2G2 SEARCH now focuses/clicks the secret input synchronously inside the user's SEARCH tap.
-- This targets iOS Safari/Home-screen keyboard suppression seen on a clean launch.
-- No UI assets, books, cover timing, scrolling, force logic, PAID/CLEAN logic, or editorial logic changed.
+- Carries forward the v.5J H2G2 keyboard blocker fix.
+- Corrects the version-marker mistake: the visible marker is baked into LIBRARY_BODY.png, so root-only 5J could never visually replace v.5I.
+- Visible marker now v.5K.
+- Cache/session identifiers bumped to 5K.
+- No books changed.
 
-Test: clean Home-screen launch → H2G2 → SEARCH. Keyboard must appear.
+DEPLOY:
+1. Upload the four root files to repository root.
+2. Open existing /assets and replace ONLY LIBRARY_BODY.png with the supplied changed asset.
+3. Leave every other asset and all /books untouched.
