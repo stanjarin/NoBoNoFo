@@ -46,7 +46,7 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
 .libHit{position:absolute;border:0;background:transparent;padding:0}
 .adminHot{position:absolute;right:0;bottom:0;width:20%;height:64px;z-index:5;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .adminPanel{position:fixed;inset:auto 12px 14px 12px;z-index:60;background:#f8f5ee;border:1px solid #999;border-radius:10px;padding:10px;display:flex;gap:8px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-.coverSplash{position:fixed;inset:0;background:#fff;z-index:50;display:flex;align-items:center;justify-content:center}
+.coverSplash{position:fixed;inset:0;background:#fff;z-index:50;display:flex;align-items:center;justify-content:center;visibility:hidden}
 .coverSplash img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;clip-path:inset(0 0 0 2px)}
 .contents{padding:0 18px 72px}
 .contentsHead{display:flex;gap:15px;align-items:flex-start;padding:18px 0 14px;border-bottom:1px solid #ccc}
@@ -104,6 +104,40 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
   display:block;
 }
 
+
+/* 5H UI chrome typography */
+.top,.top *, .contentsHead, .contentsHead *, .chapter,
+.searchOverlay,.searchOverlay *, .adminPanel,.adminPanel *,
+.importLabel,.libraryScreen{
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+}
+
+
+/* 5H maintenance sheet */
+.adminPanel{
+  position:fixed !important;
+  left:12px !important; right:12px !important; bottom:14px !important;
+  top:auto !important;
+  z-index:1000 !important;
+  min-height:58px;
+  background:#f2f2f2 !important;
+  border:1px solid #aaa !important;
+  border-radius:10px !important;
+  padding:10px !important;
+  display:flex !important;
+  align-items:center;
+  gap:8px;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+.adminPanel button,.adminPanel .importLabel{
+  appearance:none;-webkit-appearance:none;
+  border:1px solid #999;background:#fff;color:#222;
+  border-radius:7px;padding:9px 12px;font-size:12px;line-height:1;
+}
+.adminPanel input[type=file]{display:none}
+
 </style>
 </head>
 <body><div id="app"></div>
@@ -120,7 +154,7 @@ const COVER={
 };
 const LIB_ORDER=["jeeves","sotweed","farewell","keef","bloomfield","h2g2","hst","huck","jobs"];
 
-const MAGICKEY="nobonofo-magic-pass5g";
+const MAGICKEY="nobonofo-magic-pass5h";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -205,14 +239,19 @@ function absolutePage(){
 function goLibrary(){state.screen="library";state.book=null;state.edit=false;render()}
 async function openBook(id){
   state.book=await loadBook(id);state.ci=0;state.pi=0;
+  // Render destination first so there is never a blank frame behind the splash.
+  state.screen="contents";render();
   const app=$("#app"), splash=document.createElement("div");
   splash.className="coverSplash";
-  splash.innerHTML=`<img src="${COVER[id]}" alt="">`;
+  const img=document.createElement("img");
+  img.alt="";
+  splash.appendChild(img);
   app.appendChild(splash);
-  let done=false;
-  const finish=()=>{if(done)return;done=true;state.screen="contents";render()};
-  splash.onclick=finish;
-  setTimeout(finish,900);
+  // Decode before revealing the cover; then hold it for a fixed 1.5 s.
+  img.src=COVER[id];
+  try{if(img.decode) await img.decode();}catch(e){}
+  splash.style.visibility="visible";
+  setTimeout(()=>splash.remove(),1500);
 }
 function openChapter(i){state.ci=i;state.pi=0;state.screen="reader";render()}
 function pageMove(d){
@@ -288,8 +327,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-<div class="buildId">5G</div>
-      <div class="adminHot" id="adminHot"></div>
+<div class="adminHot" id="adminHot"></div>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
 
@@ -300,6 +338,7 @@ function render(){
       if(e.touches.length!==1)return;
       e.preventDefault();
       at=setTimeout(()=>{
+        document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
         panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="closeAdmin">CLOSE</button>`;
         app.appendChild(panel);

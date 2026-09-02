@@ -1,13 +1,13 @@
-# NoBo NoFo — 5G
+# NoBo NoFo — 5H
 
-Corrects the Library scroll implementation itself.
-The 5E change attempted to replace a CSS rule that was not actually present, so it had no effect.
+Pass 5 UI bundle:
+- Library identifier moved into the graphic itself: 5H replaces the top-right up/down arrows.
+- Removed the bottom-bar version overlay.
+- Book cover splash now renders without the blank-then-flash failure and holds for a fixed 1.5 seconds.
+- No tap-to-accelerate.
+- Apple/reader UI chrome explicitly restored to system sans; book prose remains serif.
+- MORE long-press maintenance sheet rebuilt as a fixed visible control sheet.
+- Library scroll/fixed bottom bar from 5G retained.
 
-5G explicitly defines:
-- scrolling Library body;
-- 52px deliberate vertical travel;
-- fixed 64px bottom navigation bar;
-- 100% / max 421px viewport-safe width;
-- visible build identifier 5G.
-
-No assets or books changed.
+BOOKS UNCHANGED.
+ASSET CHANGED: assets/LIBRARY_BODY.png
