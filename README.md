@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.2J Socket Leakage Fix
+# NoBo NoFo — PASS 4.3A Author Grafts
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -108,3 +108,10 @@ Fix:
 - PAID retains force only on exact payoff page.
 - Swipe navigation retained.
 - Books unchanged.
+
+## Pass 4.3A
+- Replaced temporary standalone `$$$.` test lines with separate author-specific prepared graft text.
+- Genuine page text is preserved independently in `paragraphs`.
+- Prepared payoff text lives in `force_paragraphs` and is rendered only while ARMED or on the exact PAID payoff page.
+- Therefore other PAID pages/books are genuinely restored, not merely hiding a socket.
+- Books changed in this build: upload `/books` too.
