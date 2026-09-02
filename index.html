@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
 <style>
 *{box-sizing:border-box} html,body{margin:0;height:100%;background:#f4f0e7;color:#171717;font-family:Georgia,"Times New Roman",serif}
@@ -18,8 +18,8 @@ button,input,textarea{font:inherit} button{cursor:pointer}
 .book h2{font-size:18px;margin:0 0 8px}.book p{font-size:12px;margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#555}
 .contents{height:calc(100% - 54px);overflow:auto;padding:18px;max-width:700px;margin:auto}
 .contents h1{font-size:25px}.chapter{width:100%;text-align:left;border:0;border-bottom:1px solid #ccc;background:transparent;padding:13px 4px;font-size:16px}
-.reader{height:calc(100% - 54px);position:relative;overflow:hidden;background:#fff}
-.page{height:100%;max-width:640px;margin:auto;padding:34px 30px 76px;overflow:auto;background:#fff;box-shadow:0 0 20px #0001;will-change:transform}
+.reader{height:calc(100% - 54px);position:relative;overflow:hidden}
+.page{height:100%;max-width:640px;margin:auto;padding:34px 30px 54px;overflow:auto;background:#fff;box-shadow:0 0 20px #0001}
 .page h1{font-size:20px;text-align:center;margin:0 0 32px}.page p{font-size:17px;line-height:1.48;text-align:justify;margin:0 0 .75em}.page p+p{text-indent:1.2em}
 .pageno{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;color:#666;pointer-events:none}
 .hit{position:absolute;top:0;bottom:0;width:22%;z-index:3}.hit.left{left:0}.hit.right{right:0}
@@ -30,13 +30,31 @@ button,input,textarea{font:inherit} button{cursor:pointer}
 .editor input{padding:8px}.editor .row{display:flex;gap:7px;align-items:center}.editor .row button{padding:8px}
 .hidden{display:none!important}
 #fileInput{display:none}
-@media(max-width:650px){.library{gap:8px;padding:10px}.book{min-height:125px;padding:9px}.book h2{font-size:14px}.page{padding:28px 22px 78px}.page p{font-size:16px}}
+@media(max-width:650px){.library{gap:8px;padding:10px}.book{min-height:125px;padding:9px}.book h2{font-size:14px}.page{padding:28px 22px 58px}.page p{font-size:16px}}
 
 .searchOverlay{position:fixed;inset:0;background:#f6f2e9;z-index:40;padding:18px;color:#222}
 .searchOverlay .searchbar{display:flex;gap:8px;margin:12px 0}
 .searchOverlay input{flex:1;font-size:18px;padding:11px;border:1px solid #aaa;border-radius:8px;background:white}
 .searchOverlay .result{display:block;width:100%;text-align:left;padding:15px 4px;border:0;border-bottom:1px solid #ccc;background:none}
 .searchOverlay .result b{display:block;font-size:17px}.searchOverlay .result small{display:block;margin-top:5px;color:#666}
+
+/* PASS 5 bundled camouflage */
+.libraryScreen{height:100%;background:#fff;display:flex;justify-content:center;overflow:hidden}
+.libraryArtWrap{position:relative;width:min(100vw,421px);aspect-ratio:421/729;background:#fff}
+.libraryArt{display:block;width:100%;height:auto}
+.libHit{position:absolute;border:0;background:transparent;padding:0}
+.adminHot{position:absolute;right:0;bottom:0;width:22%;height:9%;z-index:5}
+.adminPanel{position:fixed;inset:auto 12px 14px 12px;z-index:60;background:#f8f5ee;border:1px solid #999;border-radius:10px;padding:10px;display:flex;gap:8px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+.coverSplash{position:fixed;inset:0;background:#fff;z-index:50;display:flex;align-items:center;justify-content:center}
+.coverSplash img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.contents{padding:0 18px 72px}
+.contentsHead{display:flex;gap:15px;align-items:flex-start;padding:18px 0 14px;border-bottom:1px solid #ccc}
+.contentsHead img{width:74px;height:112px;object-fit:contain;background:#fff}
+.contentsHead h1{margin:9px 0 4px;font-size:23px}.contentsHead p{margin:0;color:#666;font:13px/1.3 -apple-system,BlinkMacSystemFont,sans-serif}
+.contentsBase{position:fixed;left:0;right:0;bottom:0;height:52px;background:#fff url("assets/CONTENTS_BASE.png") center/auto 52px no-repeat;border-top:1px solid #ddd}
+.searchOverlay{font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+.searchOverlay .top{margin:-18px -18px 12px}
+
 </style>
 </head>
 <body><div id="app"></div>
@@ -46,8 +64,14 @@ const state={screen:"library",meta:[],book:null,ci:0,pi:0,edit:false,dirty:new S
 const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
+const COVER={
+  jeeves:"assets/JEEVES.png", sotweed:"assets/SOTWEED.png", farewell:"assets/ERNEST.png",
+  keef:"assets/KEEF.png", bloomfield:"assets/BLOOMERS.png", h2g2:"assets/H2G2.png",
+  hst:"assets/HST.png", huck:"assets/HUCK.png", jobs:"assets/JOBS.png"
+};
+const LIB_ORDER=["jeeves","sotweed","farewell","keef","bloomfield","h2g2","hst","huck","jobs"];
 
-const MAGICKEY="nobonofo-magic-pass5a";
+const MAGICKEY="nobonofo-magic-pass5bundle";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -130,7 +154,17 @@ function absolutePage(){
   let n=1; for(let i=0;i<state.ci;i++)n+=state.book.chapters[i].pages.length; return n+state.pi;
 }
 function goLibrary(){state.screen="library";state.book=null;state.edit=false;render()}
-async function openBook(id){state.book=await loadBook(id);state.screen="contents";state.ci=0;state.pi=0;render()}
+async function openBook(id){
+  state.book=await loadBook(id);state.ci=0;state.pi=0;
+  const app=$("#app"), splash=document.createElement("div");
+  splash.className="coverSplash";
+  splash.innerHTML=`<img src="${COVER[id]}" alt="">`;
+  app.appendChild(splash);
+  let done=false;
+  const finish=()=>{if(done)return;done=true;state.screen="contents";render()};
+  splash.onclick=finish;
+  setTimeout(finish,900);
+}
 function openChapter(i){state.ci=i;state.pi=0;state.screen="reader";render()}
 function pageMove(d){
   const departing=pageKey();
@@ -140,9 +174,7 @@ function pageMove(d){
 
   const oldPage=document.querySelector(".page");
   const finish=()=>{
-    if(magic.phase==="ARMED" && magic.dwell?.key===departing && magic.dwell?.ripe){
-      magic.phase="PAID"; magic.paid=departing; magic.dwell=null; saveMagic();
-    }
+    maybeAutoPaid(departing);
     state.ci=ci;state.pi=pi;render();
     const incoming=document.querySelector(".page");
     if(incoming){
@@ -196,18 +228,41 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 5A reader · <small>STATE: ${esc(magic.phase)}</small></div>
-      <button id="resetTest">RESET TEST</button>
-      <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
-      <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
-    document.querySelectorAll(".book").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
-    $("#fileInput").onchange=importBook;
-    $("#resetTest").onclick=()=>resetMagic();
+    const zones=[
+      [4.7,15.8,28.5,24.7],[36.8,15.8,28.5,24.7],[68.0,15.8,28.5,24.7],
+      [4.7,41.8,28.5,24.7],[36.8,41.8,28.5,24.7],[68.0,41.8,28.5,24.7],
+      [4.7,67.9,28.5,23.2],[36.8,67.9,28.5,23.2],[68.0,67.9,28.5,23.2]
+    ];
+    app.innerHTML=`<div class="libraryScreen"><div class="libraryArtWrap">
+      <img class="libraryArt" src="assets/LIBRARY.png" alt="Library">
+      ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
+      <div class="adminHot" id="adminHot"></div>
+    </div></div>`;
+    document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
+
+    // Hidden maintenance panel: deliberate 1.2s long-press on MORE (bottom-right).
+    let at=null;
+    const hot=$("#adminHot");
+    hot.addEventListener("touchstart",e=>{
+      if(e.touches.length!==1)return;
+      at=setTimeout(()=>{
+        const panel=document.createElement("div");panel.className="adminPanel";
+        panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="closeAdmin">CLOSE</button>`;
+        app.appendChild(panel);
+        $("#resetTest").onclick=()=>resetMagic();
+        $("#fileInput").onchange=importBook;
+        $("#closeAdmin").onclick=()=>panel.remove();
+      },1200);
+    },{passive:true});
+    ["touchend","touchcancel","touchmove"].forEach(ev=>hot.addEventListener(ev,()=>{if(at){clearTimeout(at);at=null}},{passive:true}));
     return;
   }
   if(state.screen==="contents"){
-    app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b> — ${esc(state.book.author)}</div>${state.book.id==="h2g2"&&magic.phase==="READY"?'<button id="searchBook">SEARCH</button>':'<button id="export">EXPORT</button>'}</div>
-      <div class="contents"><h1>Contents</h1>${state.book.chapters.map((c,i)=>`<button class="chapter" data-i="${i}">${esc(c.title)} <small>(${c.pages.length} pages)</small></button>`).join("")}</div>`;
+    app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b></div>${state.book.id==="h2g2"&&magic.phase==="READY"?'<button id="searchBook">SEARCH</button>':'<button id="export">EXPORT</button>'}</div>
+      <div class="contents">
+        <div class="contentsHead"><img src="${COVER[state.book.id]}" alt=""><div><h1>${esc(state.book.title)}</h1><p>${esc(state.book.author)}</p></div></div>
+        ${state.book.chapters.map((c,i)=>`<button class="chapter" data-i="${i}">${esc(c.title)}</button>`).join("")}
+      </div><div class="contentsBase"></div>`;
     $("#back").onclick=goLibrary;
     if($("#export"))$("#export").onclick=exportBook;
     if($("#searchBook"))$("#searchBook").onclick=openH2G2Search;

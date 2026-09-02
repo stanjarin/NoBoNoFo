@@ -1,5 +1,6 @@
-const CACHE="nobonofo-pass5a";
-const CORE=["./","./index.html","./manifest.webmanifest","./books/index.json"];
+const CACHE="nobonofo-pass5bundle";
+const CORE=["./","./index.html","./manifest.webmanifest","./books/index.json",
+"./assets/LIBRARY.png","./assets/HST.png","./assets/CONTENTS_BASE.png","./assets/NOBO_ICON.png"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{
