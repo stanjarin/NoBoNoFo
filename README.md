@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.3D Local Editorial Merge Fix
+# NoBo NoFo — PASS 5A Reader Motion
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -140,3 +140,9 @@ Fix:
   copy could override the updated server copy while other books worked.
 - CLEAN gesture from 4.3C retained.
 - Books unchanged.
+
+## Pass 5A — first camouflage/UI pass
+- Restores horizontal page-slide motion at 0.22 seconds.
+- Reserves more bottom space so prose cannot bury the page number.
+- No book data changed.
+- Pass 4 state engine and CLEAN gesture retained unchanged.

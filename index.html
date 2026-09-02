@@ -18,8 +18,8 @@ button,input,textarea{font:inherit} button{cursor:pointer}
 .book h2{font-size:18px;margin:0 0 8px}.book p{font-size:12px;margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#555}
 .contents{height:calc(100% - 54px);overflow:auto;padding:18px;max-width:700px;margin:auto}
 .contents h1{font-size:25px}.chapter{width:100%;text-align:left;border:0;border-bottom:1px solid #ccc;background:transparent;padding:13px 4px;font-size:16px}
-.reader{height:calc(100% - 54px);position:relative;overflow:hidden}
-.page{height:100%;max-width:640px;margin:auto;padding:34px 30px 54px;overflow:auto;background:#fff;box-shadow:0 0 20px #0001}
+.reader{height:calc(100% - 54px);position:relative;overflow:hidden;background:#fff}
+.page{height:100%;max-width:640px;margin:auto;padding:34px 30px 76px;overflow:auto;background:#fff;box-shadow:0 0 20px #0001;will-change:transform}
 .page h1{font-size:20px;text-align:center;margin:0 0 32px}.page p{font-size:17px;line-height:1.48;text-align:justify;margin:0 0 .75em}.page p+p{text-indent:1.2em}
 .pageno{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;color:#666;pointer-events:none}
 .hit{position:absolute;top:0;bottom:0;width:22%;z-index:3}.hit.left{left:0}.hit.right{right:0}
@@ -30,7 +30,7 @@ button,input,textarea{font:inherit} button{cursor:pointer}
 .editor input{padding:8px}.editor .row{display:flex;gap:7px;align-items:center}.editor .row button{padding:8px}
 .hidden{display:none!important}
 #fileInput{display:none}
-@media(max-width:650px){.library{gap:8px;padding:10px}.book{min-height:125px;padding:9px}.book h2{font-size:14px}.page{padding:28px 22px 58px}.page p{font-size:16px}}
+@media(max-width:650px){.library{gap:8px;padding:10px}.book{min-height:125px;padding:9px}.book h2{font-size:14px}.page{padding:28px 22px 78px}.page p{font-size:16px}}
 
 .searchOverlay{position:fixed;inset:0;background:#f6f2e9;z-index:40;padding:18px;color:#222}
 .searchOverlay .searchbar{display:flex;gap:8px;margin:12px 0}
@@ -47,7 +47,7 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
-const MAGICKEY="nobonofo-magic-pass43d";
+const MAGICKEY="nobonofo-magic-pass5a";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -137,10 +137,29 @@ function pageMove(d){
   let ci=state.ci,pi=state.pi+d;
   if(pi<0){if(ci===0)return;ci--;pi=state.book.chapters[ci].pages.length-1}
   if(pi>=state.book.chapters[ci].pages.length){if(ci===state.book.chapters.length-1)return;ci++;pi=0}
-  maybeAutoPaid(departing);
-  state.ci=ci;state.pi=pi;render();
-}
 
+  const oldPage=document.querySelector(".page");
+  const finish=()=>{
+    if(magic.phase==="ARMED" && magic.dwell?.key===departing && magic.dwell?.ripe){
+      magic.phase="PAID"; magic.paid=departing; magic.dwell=null; saveMagic();
+    }
+    state.ci=ci;state.pi=pi;render();
+    const incoming=document.querySelector(".page");
+    if(incoming){
+      incoming.style.transform=`translateX(${d>0?100:-100}%)`;
+      incoming.style.transition="none";
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        incoming.style.transition="transform .22s ease-out";
+        incoming.style.transform="translateX(0)";
+      }));
+    }
+  };
+  if(oldPage){
+    oldPage.style.transition="transform .22s ease-out";
+    oldPage.style.transform=`translateX(${d>0?-100:100}%)`;
+    setTimeout(finish,220);
+  }else finish();
+}
 function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
@@ -177,7 +196,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.3D reader · <small>STATE: ${esc(magic.phase)}</small></div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 5A reader · <small>STATE: ${esc(magic.phase)}</small></div>
       <button id="resetTest">RESET TEST</button>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;

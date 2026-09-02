@@ -1,4 +1,4 @@
-const CACHE="nobonofo-pass43d";
+const CACHE="nobonofo-pass5a";
 const CORE=["./","./index.html","./manifest.webmanifest","./books/index.json"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
