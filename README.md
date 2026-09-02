@@ -1,11 +1,12 @@
-# NoBo NoFo — PASS 5C CLEAN PLAYING FIELD
+# NoBo NoFo — PASS 5D VIEWPORT FIX
 
-- Removes visible literal `\n`.
-- Library book grid scrolls beneath a fixed bottom app menu.
-- No Library stretching/distortion.
-- HST/FLLV thumbnail retained.
-- Clips 2 px left-edge hairline on large cover splash images without scaling.
-- SEARCH appears only for H2G2 while READY; no EXPORT in performance Contents.
-- EXPORT remains in EDIT mode.
-- MORE long-press suppresses iOS selection/callout overlay.
-- Pass 4 engine unchanged. Books unchanged.
+Targeted correction after 5C iPhone field test.
+
+- Removes the actual literal backslash-n from the document head.
+- Replaces CSS `min(100vw,421px)` Library sizing with older-iPhone-safe
+  `width:100%; max-width:421px`.
+- Hard-clamps html/body/app to viewport width to prevent intrinsic image/UI overflow.
+- Fixed Library base explicitly scales within the wrapper.
+- MORE maintenance hot zone remains wholly inside the visible rightmost cell.
+- No book data changed.
+- No Pass 4 state logic changed.
