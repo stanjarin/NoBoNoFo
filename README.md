@@ -1,14 +1,19 @@
-# NoBo NoFo — v.5L
+# NoBo NoFo — v.5M
 
-W3 FORCE PROPAGATION BLOCKER FIX.
+W3 DATA FIX — prepared socket on every page.
 
-- ARMED force now renders on every reachable page, not only pages already carrying force_paragraphs.
-- Existing authored force_paragraphs remain preferred wherever present.
-- Pages without them use a temporary book-specific mechanical graft for state testing.
-- Genuine paragraphs are not modified.
-- PAID still restores genuine text everywhere except the exact payoff page.
-- CLEAN still restores genuine text everywhere.
-- v.5J/5K keyboard fix retained.
-- Cover-slide remains deferred W1.
+- Removes the bad v.5L runtime repeated-graft approach by returning to the v.5K engine.
+- Every one of the 9,761 shipped logical pages now has its own force_paragraphs.
+- Each prepared page is based on that page's own genuine prose; the socket is inserted into a sentence already on that page.
+- Existing hand-authored Pass 4 sockets are preserved.
+- Genuine paragraphs are untouched underneath.
+- PAID / CLEAN machinery is unchanged.
+- Keyboard fix retained.
+- W1 cover slide remains deferred.
 
-No /books files changed.
+VERIFIED:
+- pages checked: 9,761
+- pages missing a $$$ socket: 0
+- total $$$ sockets: 9,762
+
+BOOKS CHANGED.
