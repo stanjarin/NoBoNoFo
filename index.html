@@ -56,6 +56,20 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
 .searchOverlay{font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 .searchOverlay .top{margin:-18px -18px 12px}
 
+
+.buildId{
+  position:absolute;
+  right:28px;
+  bottom:4px;
+  z-index:30;
+  font:500 9px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  letter-spacing:.15px;
+  color:rgba(70,70,70,.62);
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
 </style>
 </head>
 <body><div id="app"></div>
@@ -72,7 +86,7 @@ const COVER={
 };
 const LIB_ORDER=["jeeves","sotweed","farewell","keef","bloomfield","h2g2","hst","huck","jobs"];
 
-const MAGICKEY="nobonofo-magic-pass5e";
+const MAGICKEY="nobonofo-magic-pass5f";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -240,6 +254,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
+<div class="buildId">5F</div>
       <div class="adminHot" id="adminHot"></div>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
