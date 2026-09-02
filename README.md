@@ -1,12 +1,8 @@
-# NoBo NoFo — v.5I
+# NoBo NoFo — v.5J
 
-- Version identifier now uses credible `v.5I` form and replaces the Library arrow pair.
-- Cover is shown immediately on book tap, before asynchronous book loading.
-- Cover holds at least 1.5 seconds, then Contents appears. No tap acceleration.
-- MORE is now a real transparent button above the Library base graphic.
-- Library base image is non-interactive to defeat Safari image long-press menus.
-- Maintenance long-press remains 1.2 seconds.
-- Scroll/fixed bar and system sans from prior pass retained.
+BLOCKER FIX ONLY:
+- H2G2 SEARCH now focuses/clicks the secret input synchronously inside the user's SEARCH tap.
+- This targets iOS Safari/Home-screen keyboard suppression seen on a clean launch.
+- No UI assets, books, cover timing, scrolling, force logic, PAID/CLEAN logic, or editorial logic changed.
 
-BOOKS UNCHANGED.
-CHANGED ASSET: assets/LIBRARY_BODY.png
+Test: clean Home-screen launch → H2G2 → SEARCH. Keyboard must appear.
