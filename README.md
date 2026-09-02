@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.3B CLEAN Gesture
+# NoBo NoFo — PASS 4.3C CLEAN Gesture
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -124,3 +124,10 @@ Fix:
 - Ordinary page taps/swipes do not trigger CLEAN.
 - RESET remains distinct from CLEAN.
 - Book JSON is unchanged from 4.3A.
+
+## Pass 4.3C
+- Replaces unusable page-number CLEAN gesture.
+- While PAID, long-press the always-visible EDIT button for 1.2 seconds to enter CLEAN.
+- Short tap EDIT still opens the editor normally.
+- CLEAN remains silent, deliberate, and distinct from RESET.
+- Books unchanged.

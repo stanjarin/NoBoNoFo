@@ -47,7 +47,7 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
-const MAGICKEY="nobonofo-magic-pass43b";
+const MAGICKEY="nobonofo-magic-pass43c";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -162,7 +162,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.3B reader · <small>STATE: ${esc(magic.phase)}</small></div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.3C reader · <small>STATE: ${esc(magic.phase)}</small></div>
       <button id="resetTest">RESET TEST</button>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
@@ -205,23 +205,25 @@ function render(){
     }
   },{passive:true});
 
-  $("#edit").onclick=openEditor;
-
-  // Hidden PAID -> CLEAN purge: deliberate 1.2 s long-press on page number.
-  // No visible feedback; ordinary taps/swipes do nothing.
-  const pageNo=document.querySelector(".pageno");
+  // Hidden PAID -> CLEAN purge: deliberate 1.2 s long-press on EDIT.
+  // EDIT remains a normal short-tap editor control; long-press while PAID silently purges.
+  const editBtn=$("#edit");
   let cleanTimer=null, cleanFired=false;
   const cancelClean=()=>{if(cleanTimer){clearTimeout(cleanTimer);cleanTimer=null;}};
-  pageNo.addEventListener("touchstart",e=>{
+  editBtn.addEventListener("touchstart",e=>{
     if(magic.phase!=="PAID" || e.touches.length!==1)return;
     cleanFired=false;
     cleanTimer=setTimeout(()=>{
       cleanTimer=null; cleanFired=true; cleanMagic();
     },1200);
   },{passive:true});
-  pageNo.addEventListener("touchmove",cancelClean,{passive:true});
-  pageNo.addEventListener("touchend",cancelClean,{passive:true});
-  pageNo.addEventListener("touchcancel",cancelClean,{passive:true});
+  editBtn.addEventListener("touchmove",cancelClean,{passive:true});
+  editBtn.addEventListener("touchend",cancelClean,{passive:true});
+  editBtn.addEventListener("touchcancel",cancelClean,{passive:true});
+  editBtn.onclick=e=>{
+    if(cleanFired){cleanFired=false; e.preventDefault(); return;}
+    openEditor();
+  };
 
   beginDwell();
 }
