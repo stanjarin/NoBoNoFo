@@ -70,6 +70,40 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
   -webkit-user-select:none;
 }
 
+
+/* 5G — explicit Library viewport/scroll structure */
+html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
+.libraryScreen{width:100%;max-width:100%;overflow:hidden}
+.libraryArtWrap{
+  position:relative;
+  width:100%;
+  max-width:421px;
+  height:100%;
+  max-height:729px;
+  background:#fff;
+  overflow:hidden;
+}
+.libraryScroll{
+  position:absolute;
+  left:0; right:0; top:0; bottom:64px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  z-index:1;
+}
+.libraryScroll>div{
+  position:relative;
+  padding-bottom:52px;
+}
+.libraryBase{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  width:100%;
+  height:auto;
+  z-index:10;
+  display:block;
+}
+
 </style>
 </head>
 <body><div id="app"></div>
@@ -86,7 +120,7 @@ const COVER={
 };
 const LIB_ORDER=["jeeves","sotweed","farewell","keef","bloomfield","h2g2","hst","huck","jobs"];
 
-const MAGICKEY="nobonofo-magic-pass5f";
+const MAGICKEY="nobonofo-magic-pass5g";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -254,7 +288,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-<div class="buildId">5F</div>
+<div class="buildId">5G</div>
       <div class="adminHot" id="adminHot"></div>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
