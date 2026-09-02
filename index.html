@@ -46,7 +46,7 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
 .libHit{position:absolute;border:0;background:transparent;padding:0}
 .adminHot{position:absolute;right:0;bottom:0;width:20%;height:64px;z-index:5;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .adminPanel{position:fixed;inset:auto 12px 14px 12px;z-index:60;background:#f8f5ee;border:1px solid #999;border-radius:10px;padding:10px;display:flex;gap:8px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-.coverSplash{position:fixed;inset:0;background:#fff;z-index:50;display:flex;align-items:center;justify-content:center;visibility:hidden}
+.coverSplash{position:fixed;inset:0;background:#fff;z-index:50;display:flex;align-items:center;justify-content:center}
 .coverSplash img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;clip-path:inset(0 0 0 2px)}
 .contents{padding:0 18px 72px}
 .contentsHead{display:flex;gap:15px;align-items:flex-start;padding:18px 0 14px;border-bottom:1px solid #ccc}
@@ -138,6 +138,33 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 }
 .adminPanel input[type=file]{display:none}
 
+
+/* 5I — MORE is a genuine control above a non-interactive base image */
+.libraryBase{
+  pointer-events:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+}
+.adminHot{
+  position:absolute !important;
+  right:0 !important;
+  bottom:0 !important;
+  width:20% !important;
+  height:64px !important;
+  z-index:50 !important;
+  border:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  touch-action:none !important;
+}
+
 </style>
 </head>
 <body><div id="app"></div>
@@ -153,8 +180,12 @@ const COVER={
   hst:"assets/HST.png", huck:"assets/HUCK.png", jobs:"assets/JOBS.png"
 };
 const LIB_ORDER=["jeeves","sotweed","farewell","keef","bloomfield","h2g2","hst","huck","jobs"];
+const COVER_PRELOAD={};
+for(const [id,src] of Object.entries(COVER)){
+  const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
+}
 
-const MAGICKEY="nobonofo-magic-pass5h";
+const MAGICKEY="nobonofo-magic-pass5i";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -238,20 +269,20 @@ function absolutePage(){
 }
 function goLibrary(){state.screen="library";state.book=null;state.edit=false;render()}
 async function openBook(id){
-  state.book=await loadBook(id);state.ci=0;state.pi=0;
-  // Render destination first so there is never a blank frame behind the splash.
-  state.screen="contents";render();
-  const app=$("#app"), splash=document.createElement("div");
+  const app=$("#app");
+  // Cover is the immediate response to the tap. Do not render Contents first.
+  const splash=document.createElement("div");
   splash.className="coverSplash";
-  const img=document.createElement("img");
-  img.alt="";
-  splash.appendChild(img);
-  app.appendChild(splash);
-  // Decode before revealing the cover; then hold it for a fixed 1.5 s.
-  img.src=COVER[id];
-  try{if(img.decode) await img.decode();}catch(e){}
   splash.style.visibility="visible";
-  setTimeout(()=>splash.remove(),1500);
+  splash.innerHTML=`<img src="${COVER[id]}" alt="">`;
+  app.appendChild(splash);
+
+  const hold=new Promise(resolve=>setTimeout(resolve,1500));
+  const loading=loadBook(id);
+  const [_,book]=await Promise.all([hold,loading]);
+
+  state.book=book; state.ci=0; state.pi=0; state.screen="contents";
+  render();
 }
 function openChapter(i){state.ci=i;state.pi=0;state.screen="reader";render()}
 function pageMove(d){
@@ -327,17 +358,19 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-<div class="adminHot" id="adminHot"></div>
+<button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
 
-    // Hidden maintenance panel: deliberate 1.2s long-press on MORE (bottom-right).
+    // Hidden maintenance panel: deliberate 1.2s long-press on MORE.
+    // Real transparent button sits above the inert Library base image.
     let at=null;
     const hot=$("#adminHot");
-    hot.addEventListener("touchstart",e=>{
-      if(e.touches.length!==1)return;
-      e.preventDefault();
+    const cancelAdmin=()=>{if(at){clearTimeout(at);at=null;}};
+    const fireAdmin=()=>{
+      cancelAdmin();
       at=setTimeout(()=>{
+        at=null;
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
         panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="closeAdmin">CLOSE</button>`;
@@ -346,8 +379,13 @@ function render(){
         $("#fileInput").onchange=importBook;
         $("#closeAdmin").onclick=()=>panel.remove();
       },1200);
-    },{passive:false});
-    ["touchend","touchcancel","touchmove"].forEach(ev=>hot.addEventListener(ev,()=>{if(at){clearTimeout(at);at=null}},{passive:true}));
+    };
+    hot.addEventListener("contextmenu",e=>e.preventDefault());
+    hot.addEventListener("pointerdown",e=>{e.preventDefault();fireAdmin()});
+    ["pointerup","pointercancel","pointerleave"].forEach(ev=>hot.addEventListener(ev,cancelAdmin));
+    // Older iOS fallback.
+    hot.addEventListener("touchstart",e=>{e.preventDefault();if(!at)fireAdmin()},{passive:false});
+    ["touchend","touchcancel","touchmove"].forEach(ev=>hot.addEventListener(ev,cancelAdmin,{passive:true}));
     return;
   }
   if(state.screen==="contents"){

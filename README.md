@@ -1,13 +1,12 @@
-# NoBo NoFo — 5H
+# NoBo NoFo — v.5I
 
-Pass 5 UI bundle:
-- Library identifier moved into the graphic itself: 5H replaces the top-right up/down arrows.
-- Removed the bottom-bar version overlay.
-- Book cover splash now renders without the blank-then-flash failure and holds for a fixed 1.5 seconds.
-- No tap-to-accelerate.
-- Apple/reader UI chrome explicitly restored to system sans; book prose remains serif.
-- MORE long-press maintenance sheet rebuilt as a fixed visible control sheet.
-- Library scroll/fixed bottom bar from 5G retained.
+- Version identifier now uses credible `v.5I` form and replaces the Library arrow pair.
+- Cover is shown immediately on book tap, before asynchronous book loading.
+- Cover holds at least 1.5 seconds, then Contents appears. No tap acceleration.
+- MORE is now a real transparent button above the Library base graphic.
+- Library base image is non-interactive to defeat Safari image long-press menus.
+- Maintenance long-press remains 1.2 seconds.
+- Scroll/fixed bar and system sans from prior pass retained.
 
 BOOKS UNCHANGED.
-ASSET CHANGED: assets/LIBRARY_BODY.png
+CHANGED ASSET: assets/LIBRARY_BODY.png
