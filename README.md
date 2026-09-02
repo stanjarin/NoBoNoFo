@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.3A Author Grafts
+# NoBo NoFo — PASS 4.3B CLEAN Gesture
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -115,3 +115,12 @@ Fix:
 - Prepared payoff text lives in `force_paragraphs` and is rendered only while ARMED or on the exact PAID payoff page.
 - Therefore other PAID pages/books are genuinely restored, not merely hiding a socket.
 - Books changed in this build: upload `/books` too.
+
+## Pass 4.3B
+- Adds deliberate hidden PAID → CLEAN trigger.
+- While PAID, long-press the visible page number for 1.2 seconds.
+- CLEAN is silent and never automatic.
+- CLEAN clears the stored force word, so even the exact payoff page renders its genuine `paragraphs`.
+- Ordinary page taps/swipes do not trigger CLEAN.
+- RESET remains distinct from CLEAN.
+- Book JSON is unchanged from 4.3A.
