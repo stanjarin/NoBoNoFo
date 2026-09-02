@@ -1,4 +1,4 @@
-# NoBo NoFo — PASS 4.3C CLEAN Gesture
+# NoBo NoFo — PASS 4.3D Local Editorial Merge Fix
 
 PASS 3 replaces the old inline/Huck-only proof-of-concept with nine external book JSON files.
 
@@ -130,4 +130,13 @@ Fix:
 - While PAID, long-press the always-visible EDIT button for 1.2 seconds to enter CLEAN.
 - Short tap EDIT still opens the editor normally.
 - CLEAN remains silent, deliberate, and distinct from RESET.
+- Books unchanged.
+
+## Pass 4.3D
+- Fixes old locally saved/editorial book copies masking newer force metadata.
+- `loadBook()` now preserves local edits but merges missing `force_paragraphs`
+  from the current shipped book JSON.
+- This specifically explains/reproduces the Jeeves miss: an older local Jeeves
+  copy could override the updated server copy while other books worked.
+- CLEAN gesture from 4.3C retained.
 - Books unchanged.

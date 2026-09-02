@@ -47,7 +47,7 @@ const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const key=id=>"nobonofo-edits-"+id;
 
-const MAGICKEY="nobonofo-magic-pass43c";
+const MAGICKEY="nobonofo-magic-pass43d";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -99,9 +99,24 @@ async function init(){
 async function loadBook(id){
   if(cache.has(id)) return cache.get(id);
   const m=state.meta.find(x=>x.id===id);
-  let b=await (await fetch(m.file,{cache:"no-store"})).json();
+  const fresh=await (await fetch(m.file,{cache:"no-store"})).json();
+  let b=fresh;
   const saved=localStorage.getItem(key(id));
-  if(saved){ try{ b=JSON.parse(saved); }catch(e){} }
+  if(saved){
+    try{
+      b=JSON.parse(saved);
+      // Preserve local editorial changes, but merge newer prepared-force metadata
+      // from the shipped book JSON. Old saved books predate force_paragraphs.
+      fresh.chapters.forEach((fc,ci)=>{
+        fc.pages.forEach((fp,pi)=>{
+          const bp=b.chapters?.[ci]?.pages?.[pi];
+          if(bp && fp.force_paragraphs && !bp.force_paragraphs){
+            bp.force_paragraphs=fp.force_paragraphs;
+          }
+        });
+      });
+    }catch(e){ b=fresh; }
+  }
   cache.set(id,b); return b;
 }
 function saveLocal(){
@@ -162,7 +177,7 @@ function openH2G2Search(){
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
-    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.3C reader · <small>STATE: ${esc(magic.phase)}</small></div>
+    app.innerHTML=`<div class="top"><div class="title"><b>Library</b> — Pass 4.3D reader · <small>STATE: ${esc(magic.phase)}</small></div>
       <button id="resetTest">RESET TEST</button>
       <label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label></div>
       <div class="library">${state.meta.map(m=>`<button class="book" data-id="${m.id}"><div><h2>${esc(m.title)}</h2><p>${esc(m.author)}</p></div><p>${m.chapters} sections · ${m.pages} pages</p></button>`).join("")}</div>`;
