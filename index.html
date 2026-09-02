@@ -185,7 +185,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const MAGICKEY="nobonofo-magic-pass5k";
+const MAGICKEY="nobonofo-magic-pass5l";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -206,11 +206,28 @@ function firstSentenceInject(text,word){
   // unless a $$$ socket is deliberately present; no destructive automatic word replacement.
   return text;
 }
+function mechanicalForceParagraphs(p){
+  // W3 fallback for pages whose shipped JSON has no prepared force_paragraphs yet.
+  // This is deliberately mechanical only; final page-by-page prose grafts remain
+  // an editorial pass. Genuine p.paragraphs are never modified.
+  const graft={
+    huck:"$$$ was the sort of thing Tom Sawyer would have had an opinion about.",
+    farewell:"That night I dreamed of $$$.",
+    hst:"“$$$,” he said slyly, looking behind him quickly. “$$$. You know the drill.”",
+    bloomfield:"Mike had heard about $$$ before, but he had never paid much attention to it.",
+    keef:"Somewhere along the way $$$ got mixed up in the whole business.",
+    jeeves:"“$$$, sir,” said Jeeves.",
+    sotweed:"It was then that $$$ first entered the matter.",
+    jobs:"It was staring us in the face the whole time: $$$.",
+    h2g2:"The problem with $$$ was not that it was impossible, but that nobody had thought to calculate the odds."
+  }[state.book?.id] || "$$$.";
+  return [graft,...p.paragraphs];
+}
 function visibleParagraphs(p){
   const k=pageKey(),forceHere=magic.phase==="ARMED" || (magic.phase==="PAID"&&magic.paid===k);
-  // Prepared force text is separate from the genuine page. This lets PAID/CLEAN
-  // restore the real book everywhere except the exact payoff page.
-  const paras=(forceHere && p.force_paragraphs) ? p.force_paragraphs : p.paragraphs;
+  // Use authored prepared text where present; otherwise provide a temporary
+  // mechanical force rendering so every reachable page can be state-tested.
+  const paras=forceHere ? (p.force_paragraphs || mechanicalForceParagraphs(p)) : p.paragraphs;
   return paras.map(x=>forceHere?firstSentenceInject(x,magic.force):x);
 }
 function beginDwell(){

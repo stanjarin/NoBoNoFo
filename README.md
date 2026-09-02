@@ -1,12 +1,14 @@
-# NoBo NoFo — v.5K
+# NoBo NoFo — v.5L
 
-- Carries forward the v.5J H2G2 keyboard blocker fix.
-- Corrects the version-marker mistake: the visible marker is baked into LIBRARY_BODY.png, so root-only 5J could never visually replace v.5I.
-- Visible marker now v.5K.
-- Cache/session identifiers bumped to 5K.
-- No books changed.
+W3 FORCE PROPAGATION BLOCKER FIX.
 
-DEPLOY:
-1. Upload the four root files to repository root.
-2. Open existing /assets and replace ONLY LIBRARY_BODY.png with the supplied changed asset.
-3. Leave every other asset and all /books untouched.
+- ARMED force now renders on every reachable page, not only pages already carrying force_paragraphs.
+- Existing authored force_paragraphs remain preferred wherever present.
+- Pages without them use a temporary book-specific mechanical graft for state testing.
+- Genuine paragraphs are not modified.
+- PAID still restores genuine text everywhere except the exact payoff page.
+- CLEAN still restores genuine text everywhere.
+- v.5J/5K keyboard fix retained.
+- Cover-slide remains deferred W1.
+
+No /books files changed.
