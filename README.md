@@ -1,18 +1,11 @@
-# NoBo NoFo — PASS 5 BUNDLED UI
+# NoBo NoFo — PASS 5C CLEAN PLAYING FIELD
 
-Bundled UI/camouflage pass after signed-off Pass 4.3D.
-
-- Horizontal page slide: 0.22 s.
-- Preserves signed-off AUTO-PAID logic.
-- Static familiar Library restored with 3x3 invisible book hit zones.
-- Baked iOS status strip removed from LIBRARY.png without stretching.
-- HST slot/cover changed to Fear and Loathing in Las Vegas, proportionally fitted.
-- Cover splash before Contents: 0.9 s; tap accelerates.
-- Contents cleaned: cover/title/author, chapter rows, no chapter page-count clutter.
-- H2G2 Search retained and visually integrated.
-- Visible developer state/RESET/IMPORT removed from Library.
-- Maintenance panel: long-press MORE at bottom-right of Library for 1.2 s.
-- Reader geometry/pagination unchanged.
-- Pass 4 CLEAN gesture remains long-press EDIT while PAID.
-- Manifest/apple-touch icon references restored to assets/NOBO_ICON.png.
-- Book JSON unchanged.
+- Removes visible literal `\n`.
+- Library book grid scrolls beneath a fixed bottom app menu.
+- No Library stretching/distortion.
+- HST/FLLV thumbnail retained.
+- Clips 2 px left-edge hairline on large cover splash images without scaling.
+- SEARCH appears only for H2G2 while READY; no EXPORT in performance Contents.
+- EXPORT remains in EDIT mode.
+- MORE long-press suppresses iOS selection/callout overlay.
+- Pass 4 engine unchanged. Books unchanged.

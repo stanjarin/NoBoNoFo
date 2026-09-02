@@ -43,10 +43,10 @@ button,input,textarea{font:inherit} button{cursor:pointer}
 .libraryArtWrap{position:relative;width:min(100vw,421px);aspect-ratio:421/729;background:#fff}
 .libraryArt{display:block;width:100%;height:auto}
 .libHit{position:absolute;border:0;background:transparent;padding:0}
-.adminHot{position:absolute;right:0;bottom:0;width:22%;height:9%;z-index:5}
+.adminHot{position:absolute;right:0;bottom:0;width:22%;height:64px;z-index:5;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .adminPanel{position:fixed;inset:auto 12px 14px 12px;z-index:60;background:#f8f5ee;border:1px solid #999;border-radius:10px;padding:10px;display:flex;gap:8px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 .coverSplash{position:fixed;inset:0;background:#fff;z-index:50;display:flex;align-items:center;justify-content:center}
-.coverSplash img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.coverSplash img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;clip-path:inset(0 0 0 2px)}
 .contents{padding:0 18px 72px}
 .contentsHead{display:flex;gap:15px;align-items:flex-start;padding:18px 0 14px;border-bottom:1px solid #ccc}
 .contentsHead img{width:74px;height:112px;object-fit:contain;background:#fff}
@@ -71,7 +71,7 @@ const COVER={
 };
 const LIB_ORDER=["jeeves","sotweed","farewell","keef","bloomfield","h2g2","hst","huck","jobs"];
 
-const MAGICKEY="nobonofo-magic-pass5bundle";
+const MAGICKEY="nobonofo-magic-pass5c";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -229,13 +229,16 @@ function render(){
   const app=$("#app");
   if(state.screen==="library"){
     const zones=[
-      [4.7,15.8,28.5,24.7],[36.8,15.8,28.5,24.7],[68.0,15.8,28.5,24.7],
-      [4.7,41.8,28.5,24.7],[36.8,41.8,28.5,24.7],[68.0,41.8,28.5,24.7],
-      [4.7,67.9,28.5,23.2],[36.8,67.9,28.5,23.2],[68.0,67.9,28.5,23.2]
+      [4.7,17.3,28.5,28.0],[36.8,17.3,28.5,28.0],[68.0,17.3,28.5,28.0],
+      [4.7,45.8,28.5,28.0],[36.8,45.8,28.5,28.0],[68.0,45.8,28.5,28.0],
+      [4.7,74.3,28.5,25.7],[36.8,74.3,28.5,25.7],[68.0,74.3,28.5,25.7]
     ];
     app.innerHTML=`<div class="libraryScreen"><div class="libraryArtWrap">
-      <img class="libraryArt" src="assets/LIBRARY.png" alt="Library">
-      ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
+      <div class="libraryScroll"><div style="position:relative">
+        <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
+        ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
+      </div></div>
+      <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
       <div class="adminHot" id="adminHot"></div>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
@@ -245,6 +248,7 @@ function render(){
     const hot=$("#adminHot");
     hot.addEventListener("touchstart",e=>{
       if(e.touches.length!==1)return;
+      e.preventDefault();
       at=setTimeout(()=>{
         const panel=document.createElement("div");panel.className="adminPanel";
         panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="closeAdmin">CLOSE</button>`;
@@ -253,12 +257,12 @@ function render(){
         $("#fileInput").onchange=importBook;
         $("#closeAdmin").onclick=()=>panel.remove();
       },1200);
-    },{passive:true});
+    },{passive:false});
     ["touchend","touchcancel","touchmove"].forEach(ev=>hot.addEventListener(ev,()=>{if(at){clearTimeout(at);at=null}},{passive:true}));
     return;
   }
   if(state.screen==="contents"){
-    app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b></div>${state.book.id==="h2g2"&&magic.phase==="READY"?'<button id="searchBook">SEARCH</button>':'<button id="export">EXPORT</button>'}</div>
+    app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b></div>${state.book.id==="h2g2"&&magic.phase==="READY"?'<button id="searchBook">SEARCH</button>':''}</div>
       <div class="contents">
         <div class="contentsHead"><img src="${COVER[state.book.id]}" alt=""><div><h1>${esc(state.book.title)}</h1><p>${esc(state.book.author)}</p></div></div>
         ${state.book.chapters.map((c,i)=>`<button class="chapter" data-i="${i}">${esc(c.title)}</button>`).join("")}
