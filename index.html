@@ -167,6 +167,20 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 }
 
 
+
+/* v6 — library build label and safe H2G2 search-reader pages */
+.libraryV6{
+  position:absolute;right:24px;top:2px;z-index:35;
+  min-width:34px;height:16px;padding:0 2px;
+  display:flex;align-items:center;justify-content:flex-end;
+  background:#fff;color:rgba(70,70,70,.72);
+  font:500 9px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  pointer-events:none;
+}
+.searchReader{font-family:Georgia,"Times New Roman",serif;padding:6px 14px 28px;font-size:17px;line-height:1.45;}
+.searchReader p{margin:0 0 1em;}
+.searchReaderMeta{font:12px/1.3 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#777;margin:4px 0 18px;}
+
 /* QA v5 — runtime refinement */
 .page p{
   -webkit-hyphens:auto;
@@ -416,16 +430,22 @@ function openH2G2Search(){
     return hits;
   }
   function showReadable(hit){
+    const ch=state.book.chapters[hit.ci],pg=ch.pages[hit.pi];
+    const paras=(pg.paragraphs||[]).map(p=>`<p>${esc(p)}</p>`).join("");
     res.innerHTML=`<button class="result" id="backResults"><b>‹ Search results</b></button>
-      <div style="padding:18px 14px;font:17px/1.45 Georgia,serif">${esc(hit.text)}</div>`;
+      <div class="searchReader">
+        <div class="searchReaderMeta">Chapter ${hit.ci+1} · Page ${hit.pi+1}</div>
+        ${paras}
+      </div>`;
     $("#backResults").onclick=showResults;
   }
   function showResults(){
     const hits=genuineImprobabilityHits();
-    res.innerHTML=hits.map((h,i)=>`<button class="result${i===0?" readableResult":""}" data-hit="${i}">
+    res.innerHTML=hits.map((h,i)=>`<button class="result readableResult" data-hit="${i}">
       <b>improbability</b><small>Chapter ${h.ci+1} · ${esc(h.snip)}</small></button>`).join("");
-    const first=res.querySelector(".readableResult");
-    if(first)first.onclick=()=>showReadable(hits[Number(first.dataset.hit)]);
+    res.querySelectorAll(".readableResult").forEach(btn=>{
+      btn.onclick=()=>showReadable(hits[Number(btn.dataset.hit)]);
+    });
   }
   function submit(){
     const w=inp.value.trim();
@@ -478,6 +498,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
+      <div class="libraryV6">v6</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
