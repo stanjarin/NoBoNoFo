@@ -168,11 +168,16 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 
 
 
+
+.chapter .tocNo{display:block;font:600 11px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;color:#777;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
+.chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
+
 /* v6 — library build label and safe H2G2 search-reader pages */
 .libraryV6{
-  position:absolute;right:24px;top:2px;z-index:35;
-  min-width:34px;height:16px;padding:0 2px;
-  display:flex;align-items:center;justify-content:flex-end;
+  position:absolute;right:0;top:83px;z-index:35;
+  width:43px;height:22px;padding:0 4px;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;
   background:#fff;color:rgba(70,70,70,.72);
   font:500 9px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   pointer-events:none;
@@ -484,6 +489,75 @@ function jobsOpeningHTML(ch,paras){
   return {headHTML,body};
 }
 
+const HUCK_CONTENTS=[
+"Civilizing Huck.—Miss Watson.—Tom Sawyer Waits.",
+"The Boys Escape Jim.—Tom Sawyer’s Gang.—Deep-laid Plans.",
+"A Good Going-over.—Grace Triumphant.—‘One of Tom Sawyer’s Lies’.",
+"Huck and the Judge.—Superstition.",
+"Huck’s Father.—The Fond Parent.—Reform.",
+"He Went for Judge Thatcher.—Huck Decided to Leave.—Political Economy.—Thrashing Around.",
+"Laying for Him.—Locked in the Cabin.—Sinking the Body.—Resting.",
+"Sleeping in the Woods.—Raising the Dead.—Exploring the Island.—Finding Jim.—Jim’s Escape.—Signs.—Balum.",
+"The Cave.—The Floating House.",
+"The Find.—Old Hank Bunker.—In Disguise.",
+"Huck and the Woman.—The Search.—Prevarication.—Going to Goshen.",
+"Slow Navigation.—Borrowing Things.—Boarding the Wreck.—The Plotters.—Hunting for the Boat.",
+"Escaping from the Wreck.—The Watchman.—Sinking.",
+"A General Good Time.—The Harem.—French.",
+"Huck Loses the Raft.—In the Fog.—Huck Finds the Raft.—Trash.",
+"Expectation.—A White Lie.—Floating Currency.—Running by Cairo.—Swimming Ashore.",
+"An Evening Call.—The Farm in Arkansaw.—Interior Decorations.—Stephen Dowling Bots.—Poetical Effusions.",
+"Col. Grangerford.—Aristocracy.—Feuds.—The Testament.—Recovering the Raft.—The Wood-pile.—Pork and Cabbage.",
+"Tying Up Day-times.—An Astronomical Theory.—Running a Temperance Revival.—The Duke of Bridgewater.—The Troubles of Royalty.",
+"Huck Explains.—Laying Out a Campaign.—Working the Camp-meeting.—A Pirate at the Camp-meeting.—The Duke as a Printer.",
+"Sword Exercise.—Hamlet’s Soliloquy.—They Loafed Around Town.—A Lazy Town.—Old Boggs.—Dead.",
+"Sherburn.—Attending the Circus.—Intoxication in the Ring.—The Thrilling Tragedy.",
+"Sold.—Royal Comparisons.—Jim Gets Home-sick.",
+"Jim in Royal Robes.—They Take a Passenger.—Getting Information.—Family Grief.",
+"Is It Them?—Singing the ‘Doxologer.’—Awful Square—Funeral Orgies.—A Bad Investment.",
+"A Pious King.—The King’s Clergy.—She Asked His Pardon.—Hiding in the Room.—Huck Takes the Money.",
+"The Funeral.—Satisfying Curiosity.—Suspicious of Huck.—Quick Sales and Small.",
+"The Trip to England.—‘The Brute!’—Mary Jane Decides to Leave.—Huck Parting with Mary Jane.—Mumps.—The Opposition Line.",
+"Contested Relationship.—The King Explains the Loss.—A Question of Handwriting.—Digging up the Corpse.—Huck Escapes.",
+"The King Went for Him.—A Royal Row.—Powerful Mellow.",
+"Ominous Plans.—News from Jim.—Old Recollections.—A Sheep Story.—Valuable Information.",
+"Still and Sunday-like.—Mistaken Identity.—Up a Stump.—In a Dilemma.",
+"A Nigger Stealer.—Southern Hospitality.—A Pretty Long Blessing.—Tar and Feathers.",
+"The Hut by the Ash Hopper.—Outrageous.—Climbing the Lightning Rod.—Troubled with Witches.",
+"Escaping Properly.—Dark Schemes.—Discrimination in Stealing.—A Deep Hole.",
+"The Lightning Rod.—His Level Best.—A Bequest to Posterity.—A High Figure.",
+"The Last Shirt.—Mooning Around.—Sailing Orders.—The Witch Pie.",
+"The Coat of Arms.—A Skilled Superintendent.—Unpleasant Glory.—A Tearful Subject.",
+"Rats.—Lively Bed-fellows.—The Straw Dummy.",
+"Fishing.—The Vigilance Committee.—A Lively Run.—Jim Advises a Doctor.",
+"The Doctor.—Uncle Silas.—Sister Hotchkiss.—Aunt Sally in Trouble.",
+"Tom Sawyer Wounded.—The Doctor’s Story.—Tom Confesses.—Aunt Polly Arrives.—Hand Out Them Letters.",
+"Out of Bondage.—Paying the Captive.—Yours Truly, Huck Finn."
+];
+const FLLV_CONTENTS=[
+"We were somewhere around Barstow…",
+"The seizure of $300 from a pig woman…",
+"Strange medicine on the desert…",
+"Hideous music and the sound of many shotguns…",
+"Covering the story…",
+"A night on the town…",
+"Paranoid terror…",
+"Genius ’round the world stands hand in hand…",
+"No sympathy for the Devil…",
+"Western Union intervenes…",
+"Aaawww, Mama, can this really be the end?…",
+"Hellish speed…"
+];
+function contentsLabel(c,i){
+  if(state.book.id==="huck" && HUCK_CONTENTS[i]) return `<span class="tocNo">${i===42?"Chapter the Last":"Chapter "+(i+1)}</span><span class="tocDesc">${esc(HUCK_CONTENTS[i])}</span>`;
+  if(state.book.id==="hst" && FLLV_CONTENTS[i]) return `<span class="tocNo">Chapter ${i+1}</span><span class="tocDesc">${esc(FLLV_CONTENTS[i])}</span>`;
+  if(state.book.id==="jobs"){
+    const a=String(c.title||"").split(/\s+[—–-]\s+/,2);
+    return `<span class="tocNo">${esc(jobsMixedCase(a[0]||""))}</span><span class="tocDesc jobsTocTitle">${esc(jobsMixedCase(a[1]||""))}</span>`;
+  }
+  return esc(c.title);
+}
+
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
@@ -533,7 +607,7 @@ function render(){
     app.innerHTML=`<div class="top"><button id="back">LIBRARY</button><div class="title"><b>${esc(state.book.title)}</b></div>${state.book.id==="h2g2"&&magic.phase==="READY"?'<button id="searchBook">SEARCH</button>':''}</div>
       <div class="contents">
         <div class="contentsHead"><img src="${COVER[state.book.id]}" alt=""><div><h1>${esc(state.book.title)}</h1><p>${esc(state.book.author)}</p></div></div>
-        ${state.book.chapters.map((c,i)=>`<button class="chapter" data-i="${i}">${esc(c.title)}</button>`).join("")}
+        ${state.book.chapters.map((c,i)=>`<button class="chapter" data-i="${i}">${contentsLabel(c,i)}</button>`).join("")}
       </div><div class="contentsBase"></div>`;
     $("#back").onclick=goLibrary;
     if($("#export"))$("#export").onclick=exportBook;
