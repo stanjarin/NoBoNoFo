@@ -60,7 +60,8 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
 .buildId{
   position:absolute;
   right:28px;
-  bottom:4px;
+  top:4px;
+  bottom:auto;
   z-index:30;
   font:500 9px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   letter-spacing:.15px;
@@ -164,6 +165,76 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
   -webkit-touch-callout:none !important;
   touch-action:none !important;
 }
+
+
+/* QA v5 — runtime refinement */
+.page p{
+  -webkit-hyphens:auto;
+  hyphens:auto;
+  overflow-wrap:normal;
+}
+.coverSplash{
+  transform:translateX(0);
+  transition:transform .30s ease-in;
+  will-change:transform;
+}
+.coverSplash.coverExit{ transform:translateX(-105%); }
+
+.jobsOpen{
+  text-align:center;
+  margin:0 0 26px;
+  font-family:Georgia,"Times New Roman",serif;
+}
+.jobsChapNo{
+  margin:0 0 10px;
+  font:700 13px/1.15 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  letter-spacing:.08em;
+  color:#000;
+  text-transform:none;
+}
+.jobsChapTitle{
+  margin:0 0 23px;
+  font-size:29px;
+  line-height:1.06;
+  font-weight:700;
+  color:#000;
+}
+.jobsSub{
+  margin-left:auto;
+  margin-right:auto;
+  max-width:94%;
+}
+.jobsSub1{
+  margin-top:0;
+  margin-bottom:16px;
+  font-size:20px;
+  line-height:1.18;
+  font-weight:700;
+}
+.jobsSub2{
+  margin-top:0;
+  margin-bottom:14px;
+  font-size:16px;
+  line-height:1.22;
+  font-weight:500;
+}
+.jobsSub3{
+  margin-top:0;
+  margin-bottom:13px;
+  font-size:14px;
+  line-height:1.24;
+  font-style:italic;
+  font-weight:400;
+}
+.jobsSub4,.jobsSub5{
+  margin-top:0;
+  margin-bottom:11px;
+  font:600 11px/1.28 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  letter-spacing:.055em;
+  color:#777;
+  text-transform:uppercase;
+}
+.jobsOpen + p{ text-indent:0 !important; }
 
 </style>
 </head>
@@ -283,6 +354,14 @@ async function openBook(id){
 
   state.book=book; state.ci=0; state.pi=0; state.screen="contents";
   render();
+  // Put the already-loaded cover back above Contents, then slide it away.
+  // render() replaced #app contents, so re-append the same splash node synchronously;
+  // the browser will paint Contents underneath, not Library.
+  app.appendChild(splash);
+  void splash.offsetWidth;
+  splash.classList.add("coverExit");
+  await new Promise(resolve=>setTimeout(resolve,300));
+  splash.remove();
 }
 function openChapter(i){state.ci=i;state.pi=0;state.screen="reader";render()}
 function pageMove(d){
@@ -322,35 +401,69 @@ function openH2G2Search(){
     <div id="results"></div>`;
   app.appendChild(ov);
   const inp=$("#secretSearch"),res=$("#results");
+  inp.readOnly=false; inp.disabled=false; inp.focus({preventScroll:true}); inp.click();
 
-  // iOS standalone/Safari requires keyboard focus to remain inside the
-  // originating user gesture. This function itself is called by SEARCH's click
-  // handler, so focus synchronously before any deferred work.
-  inp.readOnly=false;
-  inp.disabled=false;
-  inp.focus({preventScroll:true});
-  inp.click();
-
+  function esc(x){return String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function genuineImprobabilityHits(){
+    const hits=[];
+    (state.book.chapters||[]).forEach((ch,ci)=>(ch.pages||[]).forEach((pg,pi)=>(pg.paragraphs||[]).forEach((para,pari)=>{
+      const text=String(para||""),rx=/improbability/ig; let m;
+      while((m=rx.exec(text))){
+        const a=Math.max(0,m.index-62),b=Math.min(text.length,m.index+m[0].length+88);
+        hits.push({ci,pi,pari,text,snip:(a?"…":"")+text.slice(a,b)+(b<text.length?"…":"")});
+      }
+    })));
+    return hits;
+  }
+  function showReadable(hit){
+    res.innerHTML=`<button class="result" id="backResults"><b>‹ Search results</b></button>
+      <div style="padding:18px 14px;font:17px/1.45 Georgia,serif">${esc(hit.text)}</div>`;
+    $("#backResults").onclick=showResults;
+  }
+  function showResults(){
+    const hits=genuineImprobabilityHits();
+    res.innerHTML=hits.map((h,i)=>`<button class="result${i===0?" readableResult":""}" data-hit="${i}">
+      <b>improbability</b><small>Chapter ${h.ci+1} · ${esc(h.snip)}</small></button>`).join("");
+    const first=res.querySelector(".readableResult");
+    if(first)first.onclick=()=>showReadable(hits[Number(first.dataset.hit)]);
+  }
   function submit(){
     const w=inp.value.trim();
     if(!w || w.toLowerCase()==="improbability")return;
     armMagic(w);
-    // ONE state change: the same Search/Done action that commits the covert word
-    // transforms the visible field and produces the innocent results.
     inp.value="improbability";
     inp.blur();
-    res.innerHTML=`<button class="result" id="improbResult"><b>Infinite Improbability Drive</b><small>Chapter 10 · “…the principle of generating finite amounts of improbability…”</small></button>
-      <button class="result"><b>improbability</b><small>More matches in this book</small></button>`;
-    $("#improbResult").onclick=()=>{
-      ov.remove();
-      state.ci=Math.min(9,state.book.chapters.length-1);
-      state.pi=0;state.screen="reader";render();
-    };
+    showResults();
   }
-
   $("#searchForm").addEventListener("submit",e=>{e.preventDefault();submit()});
   $("#sx").onclick=()=>ov.remove();
 }
+function jobsMixedCase(s){
+  s=String(s||"");
+  if(s!==s.toUpperCase())return s;
+  return s.toLowerCase().replace(/(^|[\s—–-])([a-z])/g,(m,p,c)=>p+c.toUpperCase());
+}
+
+function jobsOpeningHTML(ch,paras){
+  const parts=String(ch.title||"").split(/\s+[—–-]\s+/,2);
+  const chapNo=parts[0]||"";
+  const chapTitle=parts[1]||"";
+  let n=0;
+  while(n<paras.length){
+    const wc=String(paras[n]).trim().split(/\s+/).filter(Boolean).length;
+    if(wc>18)break;
+    n++;
+  }
+  const heads=paras.slice(0,n);
+  const body=paras.slice(n);
+  const headHTML=`<div class="jobsOpen">
+    <div class="jobsChapNo">${esc(jobsMixedCase(chapNo))}</div>
+    <div class="jobsChapTitle">${esc(jobsMixedCase(chapTitle))}</div>
+    ${heads.map((x,i)=>`<div class="jobsSub jobsSub${Math.min(i+1,5)}">${esc(x)}</div>`).join("")}
+  </div>`;
+  return {headHTML,body};
+}
+
 function render(){
   const app=$("#app");
   if(state.screen==="library"){
@@ -408,8 +521,16 @@ function render(){
     return;
   }
   const p=currentPage(),ch=state.book.chapters[state.ci];
+  const shown=visibleParagraphs(p);
+  let openingHTML=p.opener?`<h1>${esc(ch.title)}</h1>`:"";
+  let bodyParas=shown;
+  if(p.opener && state.book.id==="jobs"){
+    const j=jobsOpeningHTML(ch,shown);
+    openingHTML=j.headHTML;
+    bodyParas=j.body;
+  }
   app.innerHTML=`<div class="top"><button id="contents">CONTENTS</button><div class="title">${esc(state.book.title)} · ${esc(ch.title)}</div><button id="edit">EDIT</button></div>
-    <div class="reader"><div class="page">${p.opener?`<h1>${esc(ch.title)}</h1>`:""}${visibleParagraphs(p).map(x=>`<p>${esc(x)}</p>`).join("")}</div>
+    <div class="reader"><div class="page">${openingHTML}${bodyParas.map(x=>`<p>${esc(x)}</p>`).join("")}</div>
     <div class="hit left" id="left"></div><div class="hit right" id="right"></div>
     <div class="pageno">${absolutePage()} / ${totalBookPages()}</div></div>`;
   $("#contents").onclick=()=>{state.screen="contents";render()};
