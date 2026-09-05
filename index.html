@@ -265,7 +265,8 @@ const $=s=>document.querySelector(s);
 const state={screen:"library",meta:[],book:null,ci:0,pi:0,edit:false,dirty:new Set()};
 const cache=new Map();
 const clone=o=>JSON.parse(JSON.stringify(o));
-const key=id=>"nobonofo-edits-"+id;
+const EDIT_SCHEMA="v6-20260905";
+const key=id=>`nobonofo-edits-${EDIT_SCHEMA}-${id}`;
 const COVER={
   jeeves:"assets/JEEVES.png", sotweed:"assets/SOTWEED.png", farewell:"assets/ERNEST.png",
   keef:"assets/KEEF.png", bloomfield:"assets/BLOOMERS.png", h2g2:"assets/H2G2.png",
