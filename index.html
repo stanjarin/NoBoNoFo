@@ -600,11 +600,30 @@ function render(){
       },1200);
     };
     hot.addEventListener("contextmenu",e=>e.preventDefault());
-    hot.addEventListener("pointerdown",e=>{e.preventDefault();fireAdmin()});
-    ["pointerup","pointercancel","pointerleave"].forEach(ev=>hot.addEventListener(ev,cancelAdmin));
-    // Older iOS fallback.
-    hot.addEventListener("touchstart",e=>{e.preventDefault();if(!at)fireAdmin()},{passive:false});
-    ["touchend","touchcancel","touchmove"].forEach(ev=>hot.addEventListener(ev,cancelAdmin,{passive:true}));
+
+    // Robust MORE long-press. On touch screens, tiny finger drift must NOT cancel it.
+    // Touch owns touch; pointer handlers are retained only for mouse/pen.
+    let adminX=0,adminY=0;
+    hot.addEventListener("touchstart",e=>{
+      if(e.touches.length!==1)return;
+      e.preventDefault();
+      adminX=e.touches[0].clientX; adminY=e.touches[0].clientY;
+      fireAdmin();
+    },{passive:false});
+    hot.addEventListener("touchmove",e=>{
+      if(!at || !e.touches.length)return;
+      const dx=e.touches[0].clientX-adminX, dy=e.touches[0].clientY-adminY;
+      if(Math.hypot(dx,dy)>24)cancelAdmin();
+    },{passive:true});
+    ["touchend","touchcancel"].forEach(ev=>hot.addEventListener(ev,cancelAdmin,{passive:true}));
+
+    hot.addEventListener("pointerdown",e=>{
+      if(e.pointerType==="touch")return;
+      e.preventDefault(); fireAdmin();
+    });
+    ["pointerup","pointercancel","pointerleave"].forEach(ev=>hot.addEventListener(ev,e=>{
+      if(e.pointerType!=="touch")cancelAdmin();
+    }));
     return;
   }
   if(state.screen==="contents"){
