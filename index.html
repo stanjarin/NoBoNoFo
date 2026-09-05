@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.2">
-<!-- NOBO NOFO BUILD: v6.2 -->
+<meta name="nobonofo-build" content="v6.3">
+<!-- NOBO NOFO BUILD: v6.3 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -175,7 +175,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.2 — library build label and safe H2G2 search-reader pages */
+/* v6.3 — library build label and safe H2G2 search-reader pages */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -278,19 +278,19 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.2";
+const BUILD_VERSION="v6.3";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
-const magic=Object.assign({phase:"READY",force:"",paid:null,dwell:null},JSON.parse(sessionStorage.getItem(MAGICKEY)||"{}"));
+const magic=Object.assign({phase:"READY",force:"",paid:null,dwell:null,selectedChapter:null},JSON.parse(sessionStorage.getItem(MAGICKEY)||"{}"));
 function saveMagic(){sessionStorage.setItem(MAGICKEY,JSON.stringify(magic))}
-function resetMagic(){Object.assign(magic,{phase:"READY",force:"",paid:null,dwell:null});saveMagic();goLibrary()}
+function resetMagic(){Object.assign(magic,{phase:"READY",force:"",paid:null,dwell:null,selectedChapter:null});saveMagic();goLibrary()}
 function cleanMagic(){if(magic.phase==="PAID"){magic.phase="CLEAN";magic.force="";saveMagic();render()}}
 function armMagic(word){
   word=String(word||"").trim();
   if(!word)return;
-  magic.phase="ARMED";magic.force=word;magic.paid=null;magic.dwell=null;saveMagic();
+  magic.phase="ARMED";magic.force=word;magic.paid=null;magic.dwell=null;magic.selectedChapter=null;saveMagic();
 }
 function pageKey(){return state.book?`${state.book.id}:${state.ci}:${state.pi}`:""}
 function firstSentenceInject(text,word){
@@ -301,15 +301,29 @@ function firstSentenceInject(text,word){
   return text;
 }
 function visibleParagraphs(p){
-  const k=pageKey(),forceHere=magic.phase==="ARMED" || (magic.phase==="PAID"&&magic.paid===k);
-  // Prepared force text is separate from the genuine page. This lets PAID/CLEAN
-  // restore the real book everywhere except the exact payoff page.
+  const k=pageKey();
+  const protectedSelectedOpener =
+    state.pi===0 &&
+    magic.selectedChapter &&
+    magic.selectedChapter.book===state.book.id &&
+    magic.selectedChapter.ci===state.ci;
+  const forceHere=!protectedSelectedOpener &&
+    (magic.phase==="ARMED" || (magic.phase==="PAID"&&magic.paid===k));
+  // Prepared force text is separate from the genuine page. The selected chapter
+  // opener stays pristine; later prepared chapter openers remain armed.
   const paras=(forceHere && p.force_paragraphs) ? p.force_paragraphs : p.paragraphs;
   return paras.map(x=>forceHere?firstSentenceInject(x,magic.force):x);
 }
 function beginDwell(){
   clearTimeout(magic._timer);
   if(magic.phase!=="ARMED")return;
+  const p=currentPage();
+  const protectedSelectedOpener =
+    state.pi===0 &&
+    magic.selectedChapter &&
+    magic.selectedChapter.book===state.book.id &&
+    magic.selectedChapter.ci===state.ci;
+  if(!p.force_paragraphs || protectedSelectedOpener)return;
   const k=pageKey();
   magic.dwell={key:k,qualified:false};
   magic._timer=setTimeout(()=>{
@@ -386,7 +400,13 @@ async function openBook(id){
   await new Promise(resolve=>setTimeout(resolve,300));
   splash.remove();
 }
-function openChapter(i){state.ci=i;state.pi=0;state.screen="reader";render()}
+function openChapter(i){
+  state.ci=i;state.pi=0;
+  if(magic.phase==="ARMED" && !magic.selectedChapter){
+    magic.selectedChapter={book:state.book.id,ci:i}; saveMagic();
+  }
+  state.screen="reader";render()
+}
 function pageMove(d){
   const departing=pageKey();
   let ci=state.ci,pi=state.pi+d;
@@ -576,7 +596,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.2</div>
+      <div class="libraryV6">v6.3</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
