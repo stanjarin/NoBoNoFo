@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.3">
-<!-- NOBO NOFO BUILD: v6.3 -->
+<meta name="nobonofo-build" content="v6.4">
+<!-- NOBO NOFO BUILD: v6.4 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -175,7 +175,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.3 — library build label and safe H2G2 search-reader pages */
+/* v6.4 — library build label and safe H2G2 search-reader pages */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -278,7 +278,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.3";
+const BUILD_VERSION="v6.4";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
@@ -368,6 +368,17 @@ async function loadBook(id){
 function saveLocal(){
   if(!state.book)return;
   localStorage.setItem(key(state.book.id),JSON.stringify(state.book));
+}
+function clearImportedBookData(){
+  const prefix=`nobonofo-edits-${EDIT_SCHEMA}-`;
+  const doomed=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k && k.startsWith(prefix))doomed.push(k);
+  }
+  doomed.forEach(k=>localStorage.removeItem(k));
+  cache.clear();
+  alert(`Cleared ${doomed.length} imported/edited NoBo book${doomed.length===1?"":"s"}.`);
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function currentPage(){return state.book.chapters[state.ci].pages[state.pi]}
@@ -596,7 +607,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.3</div>
+      <div class="libraryV6">v6.4</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
@@ -612,10 +623,13 @@ function render(){
         at=null;
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
-        panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="closeAdmin">CLOSE</button>`;
+        panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLEAR DATA</button><button id="closeAdmin">CLOSE</button>`;
         app.appendChild(panel);
         $("#resetTest").onclick=()=>resetMagic();
         $("#fileInput").onchange=importBook;
+        $("#clearBooks").onclick=()=>{
+          if(confirm("Clear all imported/edited NoBo book data stored on this device? Shipped GitHub books and magic RESET state are untouched.")) clearImportedBookData();
+        };
         $("#closeAdmin").onclick=()=>panel.remove();
       },1200);
     };
