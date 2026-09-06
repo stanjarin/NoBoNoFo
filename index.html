@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.10">
-<!-- NOBO NOFO BUILD: v6.10 -->
+<meta name="nobonofo-build" content="v6.12">
+<!-- NOBO NOFO BUILD: v6.12 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -58,6 +58,7 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
 .contentsHead h1{margin:9px 0 4px;font-size:23px}.contentsHead p{margin:0;color:#666;font:13px/1.3 -apple-system,BlinkMacSystemFont,sans-serif}
 .contentsBase{position:fixed;left:0;right:0;bottom:0;height:52px;background:#fff url("assets/CONTENTS_BASE.png") center/auto 52px no-repeat;border-top:1px solid #ddd}
 .searchOverlay{font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+.searchOverlay .page{font-family:Georgia,"Times New Roman",serif}
 .searchOverlay .top{margin:-18px -18px 12px}
 
 
@@ -177,7 +178,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.10 — populated SEARCH results + scrollable book-style fake page */
+/* v6.12 — populated SEARCH results + scrollable book-style fake page */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -281,7 +282,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.10";
+const BUILD_VERSION="v6.12";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
@@ -610,9 +611,9 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
+        <div class="libraryV6">v6.12</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.10</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
