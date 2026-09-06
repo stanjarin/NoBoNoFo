@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.5">
-<!-- NOBO NOFO BUILD: v6.5 -->
+<meta name="nobonofo-build" content="v6.6">
+<!-- NOBO NOFO BUILD: v6.6 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -175,7 +175,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.5 — deterministic H2G2 fake Improbability search result/page */
+/* v6.6 — populated SEARCH results + scrollable book-style fake page */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -184,9 +184,13 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
   font:500 9px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   pointer-events:none;
 }
-.searchReader{font-family:Georgia,"Times New Roman",serif;padding:6px 14px 28px;font-size:17px;line-height:1.45;}
-.searchReader p{margin:0 0 1em;}
-.searchReaderMeta{font:12px/1.3 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#777;margin:4px 0 18px;}
+.searchOverlay{display:flex;flex-direction:column;overflow:hidden;}
+.searchOverlay #results{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.searchReader{box-sizing:border-box;max-width:640px;min-height:100%;margin:0 auto;padding:34px 30px 54px;background:#fff;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.48;}
+.searchReader p{text-align:justify;margin:0 0 .75em;}
+.searchReader p+p{text-indent:1.2em;}
+.searchReaderMeta{font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:bold;text-align:center;color:#222;margin:0 0 32px;}
+@media(max-width:650px){.searchReader{padding:28px 22px 58px;font-size:16px;}}
 
 /* QA v5 — runtime refinement */
 .page p{
@@ -278,7 +282,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.5";
+const BUILD_VERSION="v6.6";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
@@ -461,7 +465,19 @@ function openH2G2Search(){
     res.innerHTML=`<button class="result" id="improbResult">
       <b>Force of Improbability</b>
       <small><i>Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects…</i></small>
-    </button>`;
+    </button>
+    <div class="result">
+      <b>Infinite Improbability Drive</b>
+      <small>The celebrated propulsion system based on improbability, developed after conventional approaches proved stubbornly inadequate.</small>
+    </div>
+    <div class="result">
+      <b>Improbability fields</b>
+      <small>Finite and infinite improbability fields, their generation, measurement and occasionally alarming practical consequences.</small>
+    </div>
+    <div class="result">
+      <b>Brownian Motion</b>
+      <small>A useful source of random motion; hot tea has figured prominently in several experiments involving improbability.</small>
+    </div>`;
     $("#improbResult").onclick=showFakePage;
   }
   function showFakePage(){
@@ -594,7 +610,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.5</div>
+      <div class="libraryV6">v6.6</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
