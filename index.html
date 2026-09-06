@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.9">
-<!-- NOBO NOFO BUILD: v6.9 -->
+<meta name="nobonofo-build" content="v6.10">
+<!-- NOBO NOFO BUILD: v6.10 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -177,7 +177,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.9 — populated SEARCH results + scrollable book-style fake page */
+/* v6.10 — populated SEARCH results + scrollable book-style fake page */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -188,35 +188,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 }
 .searchOverlay{display:flex;flex-direction:column;overflow:hidden;}
 .searchOverlay #results{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.searchReader{
-  height:100%;
-  max-width:640px;
-  margin:auto;
-  padding:34px 30px 54px;
-  overflow:auto;
-  background:#fff;
-  box-shadow:0 0 20px #0001;
-  font-family:Georgia,"Times New Roman",serif;
-  color:#222;
-}
-.searchReaderMeta{
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:20px;
-  font-weight:bold;
-  text-align:center;
-  margin:0 0 32px;
-}
-.searchReader p{
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:17px;
-  line-height:1.48;
-  text-align:justify;
-  margin:0 0 .75em;
-}
-.searchReader p+p{text-indent:1.2em}
-@media(max-width:650px){
-  .searchReader{padding:28px 22px 58px}
-  .searchReader p{font-size:16px}
+.searchReader p{font-size:16px}
 }
 
 /* QA v5 — runtime refinement */
@@ -309,7 +281,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.9";
+const BUILD_VERSION="v6.10";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
@@ -640,7 +612,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.9</div>
+      <div class="libraryV6">v6.10</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
