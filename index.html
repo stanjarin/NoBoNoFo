@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.4">
-<!-- NOBO NOFO BUILD: v6.4 -->
+<meta name="nobonofo-build" content="v6.5">
+<!-- NOBO NOFO BUILD: v6.5 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -175,7 +175,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.4 — library build label and safe H2G2 search-reader pages */
+/* v6.5 — deterministic H2G2 fake Improbability search result/page */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -278,7 +278,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.4";
+const BUILD_VERSION="v6.5";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
@@ -457,35 +457,22 @@ function openH2G2Search(){
   const inp=$("#secretSearch"),res=$("#results");
   inp.readOnly=false; inp.disabled=false; inp.focus({preventScroll:true}); inp.click();
 
-  function esc(x){return String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-  function genuineImprobabilityHits(){
-    const hits=[];
-    (state.book.chapters||[]).forEach((ch,ci)=>(ch.pages||[]).forEach((pg,pi)=>(pg.paragraphs||[]).forEach((para,pari)=>{
-      const text=String(para||""),rx=/improbability/ig; let m;
-      while((m=rx.exec(text))){
-        const a=Math.max(0,m.index-62),b=Math.min(text.length,m.index+m[0].length+88);
-        hits.push({ci,pi,pari,text,snip:(a?"…":"")+text.slice(a,b)+(b<text.length?"…":"")});
-      }
-    })));
-    return hits;
+  function showResults(){
+    res.innerHTML=`<button class="result" id="improbResult">
+      <b>Force of Improbability</b>
+      <small><i>Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects…</i></small>
+    </button>`;
+    $("#improbResult").onclick=showFakePage;
   }
-  function showReadable(hit){
-    const ch=state.book.chapters[hit.ci],pg=ch.pages[hit.pi];
-    const paras=(pg.paragraphs||[]).map(p=>`<p>${esc(p)}</p>`).join("");
+  function showFakePage(){
     res.innerHTML=`<button class="result" id="backResults"><b>‹ Search results</b></button>
       <div class="searchReader">
-        <div class="searchReaderMeta">Chapter ${hit.ci+1} · Page ${hit.pi+1}</div>
-        ${paras}
+        <div class="searchReaderMeta">Force of Improbability</div>
+        <p>One of the most improbable discoveries was, of course, the practical application of the Force of Improbability. Not just the theory, misunderstood by gamblers since the dawn of time, but actual uses for it.</p>
+        <p>Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects. Needless to say, it has its dangers, as evidenced by the well-documented series of kitchen explosions in Bloomington Illinois, but since the publication of Gottlieb’s “Improbability: Certain ways to Use It in The Home and Workshop” home experimentation has really taken off.</p>
+        <p>The trick is, of course, to just cast one’s fate to the wind and simply ride on it.</p>
       </div>`;
     $("#backResults").onclick=showResults;
-  }
-  function showResults(){
-    const hits=genuineImprobabilityHits();
-    res.innerHTML=hits.map((h,i)=>`<button class="result readableResult" data-hit="${i}">
-      <b>improbability</b><small>Chapter ${h.ci+1} · ${esc(h.snip)}</small></button>`).join("");
-    res.querySelectorAll(".readableResult").forEach(btn=>{
-      btn.onclick=()=>showReadable(hits[Number(btn.dataset.hit)]);
-    });
   }
   function submit(){
     const w=inp.value.trim();
@@ -607,7 +594,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.4</div>
+      <div class="libraryV6">v6.5</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
