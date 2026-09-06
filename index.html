@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.6">
-<!-- NOBO NOFO BUILD: v6.6 -->
+<meta name="nobonofo-build" content="v6.7">
+<!-- NOBO NOFO BUILD: v6.7 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -38,7 +38,9 @@ html,body{width:100%;max-width:100%;overflow:hidden} #app{width:100%;max-width:1
 .searchOverlay{position:fixed;inset:0;background:#f6f2e9;z-index:40;padding:18px;color:#222}
 .searchOverlay .searchbar{display:flex;gap:8px;margin:12px 0}
 .searchOverlay input{flex:1;font-size:18px;padding:11px;border:1px solid #aaa;border-radius:8px;background:white}
-.searchOverlay .result{display:block;width:100%;text-align:left;padding:15px 4px;border:0;border-bottom:1px solid #ccc;background:none}
+.searchOverlay .result{display:block;width:100%;text-align:left;padding:15px 4px;border:0;border-bottom:1px solid #ccc;background:none;color:#111;}
+.result b{color:#111;}
+.result small{color:#555;}
 .searchOverlay .result b{display:block;font-size:17px}.searchOverlay .result small{display:block;margin-top:5px;color:#666}
 
 /* PASS 5 bundled camouflage */
@@ -175,7 +177,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .chapter .tocDesc{display:block;font:16px/1.25 Georgia,"Times New Roman",serif;color:#111;text-transform:none}
 .chapter .jobsTocTitle{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:650}
 
-/* v6.6 — populated SEARCH results + scrollable book-style fake page */
+/* v6.7 — populated SEARCH results + scrollable book-style fake page */
 .libraryV6{
   position:absolute;right:0;top:83px;z-index:35;
   width:43px;height:22px;padding:0 4px;box-sizing:border-box;
@@ -186,11 +188,44 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 }
 .searchOverlay{display:flex;flex-direction:column;overflow:hidden;}
 .searchOverlay #results{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.searchReader{box-sizing:border-box;max-width:640px;min-height:100%;margin:0 auto;padding:34px 30px 54px;background:#fff;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.48;}
-.searchReader p{text-align:justify;margin:0 0 .75em;}
-.searchReader p+p{text-indent:1.2em;}
-.searchReaderMeta{font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:bold;text-align:center;color:#222;margin:0 0 32px;}
-@media(max-width:650px){.searchReader{padding:28px 22px 58px;font-size:16px;}}
+.searchReader{
+  box-sizing:border-box;
+  width:100%;
+  min-height:100%;
+  margin:0;
+  padding:68px 56px 72px;
+  background:transparent;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:18px;
+  line-height:1.62;
+  color:#222;
+}
+.searchReader p{
+  text-align:justify;
+  margin:0 0 1.15em;
+}
+.searchReader p+p{
+  text-indent:1.35em;
+}
+.searchReaderMeta{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:34px;
+  font-weight:bold;
+  text-align:center;
+  color:#222;
+  margin:0 0 54px;
+}
+@media(max-width:650px){
+  .searchReader{
+    padding:64px 56px 84px;
+    font-size:18px;
+    line-height:1.62;
+  }
+  .searchReaderMeta{
+    font-size:30px;
+    margin-bottom:48px;
+  }
+}
 
 /* QA v5 — runtime refinement */
 .page p{
@@ -282,7 +317,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.6";
+const BUILD_VERSION="v6.7";
 const MAGICKEY="nobonofo-magic-pass5m";
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
@@ -610,7 +645,7 @@ function render(){
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
-      <div class="libraryV6">v6.6</div>
+      <div class="libraryV6">v6.7</div>
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
     </div></div>`;
     document.querySelectorAll(".libHit").forEach(b=>b.onclick=()=>openBook(b.dataset.id));
