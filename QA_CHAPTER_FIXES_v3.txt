@@ -1,0 +1,13 @@
+NOBO NOFO AIRLOCK CHAPTER FIXES v3
+=======================================
+Jeeves — global tail: 379
+Hemingway — global I knew: 464
+Bloomers — global earliest: 1482
+Jobs — global clue: 1046
+Sot-Weed — chapter leads reverted: 66
+HST — Ch1 lead reverted: 1
+Keef — specified chapter leads repaired: 6
+Huck — resumed paragraph capitals: 25
+H2G2 — guessed repairs: 0
+
+H2G2 deliberately unchanged: broken chapter-leading sentence fragments need structural diagnosis, not an invented patch.
