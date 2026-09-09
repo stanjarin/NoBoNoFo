@@ -1,0 +1,15 @@
+NOBO NOFO AIRLOCK PHYSICS v2
+====================================
+Follower pages examined: 6857
+Follower pages rebuilt:  6857
+Natural zero-carry pages: 3510
+Chapter openers left unchanged for BROWSE inspection: 300
+Failures: 0
+
+Follower rule:
+  genuine inherited carryover (when present)
+  -> standalone new airlock
+  -> genuine current-page paragraphs
+
+Chapter openers:
+  deliberately left as v1; no new assumption baked in.
