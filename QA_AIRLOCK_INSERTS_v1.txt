@@ -1,0 +1,15 @@
+NoBo NoFo AIRLOCK INSERTS v1
+Rule: insert is standalone paragraph at old socket paragraph position; genuine runover remains above; genuine narrative resumes below as a new paragraph.
+
+bloomfield: 1482 pages; 1482 insert pages; runover above on 0; old target-index distribution {0: 1482}; socket tokens per insert 1
+farewell: 464 pages; 464 insert pages; runover above on 0; old target-index distribution {0: 464}; socket tokens per insert 1
+h2g2: 254 pages; 254 insert pages; runover above on 0; old target-index distribution {0: 254}; socket tokens per insert 1
+hst: 125 pages; 125 insert pages; runover above on 0; old target-index distribution {0: 125}; socket tokens per insert 1
+huck: 586 pages; 586 insert pages; runover above on 0; old target-index distribution {0: 586}; socket tokens per insert 1
+jeeves: 379 pages; 379 insert pages; runover above on 0; old target-index distribution {0: 379}; socket tokens per insert 1
+jobs: 1046 pages; 1046 insert pages; runover above on 0; old target-index distribution {0: 1046}; socket tokens per insert 1
+keef: 988 pages; 988 insert pages; runover above on 0; old target-index distribution {0: 988}; socket tokens per insert 1
+sotweed: 1833 pages; 1833 insert pages; runover above on 32; old target-index distribution {0: 1801, 2: 2, 1: 30}; socket tokens per insert 3
+
+TOTAL pages: 7157
+QA: every page has exactly one standalone airlock paragraph; surrounding force_paragraphs are rebuilt byte-for-text from genuine paragraphs.
