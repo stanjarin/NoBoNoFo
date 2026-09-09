@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.13R">
-<!-- NOBO NOFO BUILD: v6.13R -->
+<meta name="nobonofo-build" content="v6.14R">
+<!-- NOBO NOFO BUILD: v6.14R -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -288,8 +288,11 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.13R";
+const BUILD_VERSION="v6.14R";
 const MAGICKEY="nobonofo-magic-pass5m";
+const BROWSEKEY="nobonofo-browse-v1";
+let browseMode=localStorage.getItem(BROWSEKEY)==="1";
+function setBrowseMode(on){browseMode=!!on;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");render();}
 if(sessionStorage.getItem(MAGICKEY)===null){
   sessionStorage.setItem(MAGICKEY,JSON.stringify({phase:"READY",force:"",paid:null,dwell:null}));
 }
@@ -311,6 +314,7 @@ function firstSentenceInject(text,word){
   return text;
 }
 function visibleParagraphs(p){
+  if(browseMode && p.force_paragraphs) return p.force_paragraphs;
   const k=pageKey();
   const protectedSelectedOpener =
     state.pi===0 &&
@@ -326,6 +330,7 @@ function visibleParagraphs(p){
 }
 function beginDwell(){
   clearTimeout(magic._timer);
+  if(browseMode)return;
   if(magic.phase!=="ARMED")return;
   const p=currentPage();
   const protectedSelectedOpener =
@@ -343,6 +348,7 @@ function beginDwell(){
   },6000);
 }
 function maybeAutoPaid(departingKey){
+  if(browseMode)return;
   if(magic.phase==="ARMED"&&magic.dwell?.qualified&&magic.dwell.key===departingKey){
     magic.phase="PAID";magic.paid=departingKey;magic.dwell=null;saveMagic();
   }
@@ -617,7 +623,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.13R</div>
+        <div class="libraryV6">v6.14R</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
@@ -635,9 +641,10 @@ function render(){
         at=null;
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
-        panel.innerHTML=`<button id="resetTest">RESET</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLEAR DATA</button><button id="closeAdmin">CLOSE</button>`;
+        panel.innerHTML=`<button id="resetTest">RESET</button><button id="browseToggle">BROWSE ${browseMode?"ON":"OFF"}</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLEAR DATA</button><button id="closeAdmin">CLOSE</button>`;
         app.appendChild(panel);
         $("#resetTest").onclick=()=>resetMagic();
+        $("#browseToggle").onclick=()=>setBrowseMode(!browseMode);
         $("#fileInput").onchange=importBook;
         $("#clearBooks").onclick=()=>{
           if(confirm("Clear all imported/edited NoBo book data stored on this device? Shipped GitHub books and magic RESET state are untouched.")) clearImportedBookData();
