@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.15R">
-<!-- NOBO NOFO BUILD: v6.15R -->
+<meta name="nobonofo-build" content="v6.16R">
+<!-- NOBO NOFO BUILD: v6.16R -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -288,7 +288,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.15R";
+const BUILD_VERSION="v6.16R";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
 let browseMode=localStorage.getItem(BROWSEKEY)==="1";
@@ -464,11 +464,17 @@ function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
   const FAKE_H2_KEY="nobonofo-h2-fake-improbability-v1";
+  const FAKE_H2_TITLE_KEY="nobonofo-h2-fake-improbability-title-v1";
+  const FAKE_H2_DEFAULT_TITLE="Force of Improbability";
   const FAKE_H2_DEFAULT=[
     "One of the most improbable discoveries was, of course, the practical application of the Force of Improbability. Not just the theory, misunderstood by gamblers since the dawn of time, but actual uses for it.",
     "Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects. Needless to say, it has its dangers, as evidenced by the well-documented series of kitchen explosions in Bloomington Illinois, but since the publication of Gottlieb’s “Improbability: Certain ways to Use It in The Home and Workshop” home experimentation has really taken off.",
     "The trick is, of course, to just cast one’s fate to the wind and simply ride on it."
   ];
+  function fakeH2Title(){
+    const saved=localStorage.getItem(FAKE_H2_TITLE_KEY);
+    return saved===null?FAKE_H2_DEFAULT_TITLE:saved;
+  }
   function fakeH2Paras(){
     try{
       const saved=JSON.parse(localStorage.getItem(FAKE_H2_KEY)||"null");
@@ -506,11 +512,11 @@ function openH2G2Search(){
     $("#improbResult").onclick=showFakePage;
   }
   function showFakePage(){
-    const paras=fakeH2Paras();
-    ov.innerHTML=`<div class="top"><button id="fakeContents">CONTENTS</button><div class="title">${esc(state.book.title)} · Force of Improbability</div><button id="fakeEdit">EDIT</button></div>
+    const paras=fakeH2Paras(),title=fakeH2Title();
+    ov.innerHTML=`<div class="top"><button id="fakeContents">CONTENTS</button><div class="title">${esc(state.book.title)}${title?` · ${esc(title)}`:""}</div><button id="fakeEdit">EDIT</button></div>
       <div class="reader">
         <div class="page">
-          <h1>Force of Improbability</h1>
+          ${title?`<h1>${esc(title)}</h1>`:""}
           ${paras.map(x=>`<p>${esc(x)}</p>`).join("")}
         </div>
       </div>`;
@@ -518,12 +524,14 @@ function openH2G2Search(){
     $("#fakeEdit").onclick=()=>{
       const editor=document.createElement("div");editor.className="editor";
       editor.innerHTML=`<div class="row"><b>IMPROBABILITY EDITOR</b><span style="flex:1"></span><button id="fakeCancelEdit">CLOSE</button></div>
+        <label>Page title <input id="fakePageTitle" value="${esc(fakeH2Title())}"></label>
         <textarea id="fakePageText">${esc(fakeH2Paras().join("\n\n"))}</textarea>
         <div class="row"><button id="fakeSaveEdit">SAVE PAGE</button></div>`;
       ov.appendChild(editor);
       $("#fakeCancelEdit").onclick=()=>editor.remove();
       $("#fakeSaveEdit").onclick=()=>{
         const saved=$("#fakePageText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+        localStorage.setItem(FAKE_H2_TITLE_KEY,$("#fakePageTitle").value.trim());
         if(saved.length)localStorage.setItem(FAKE_H2_KEY,JSON.stringify(saved));
         editor.remove();
         showFakePage();
@@ -653,7 +661,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.15R</div>
+        <div class="libraryV6">v6.16R</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
