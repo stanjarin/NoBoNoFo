@@ -288,7 +288,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.14R";
+const BUILD_VERSION="v6.15R";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
 let browseMode=localStorage.getItem(BROWSEKEY)==="1";
@@ -628,7 +628,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.14R</div>
+        <div class="libraryV6">v6.15R</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
