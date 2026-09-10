@@ -463,6 +463,19 @@ function pageMove(d){
 function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
+  const FAKE_H2_KEY="nobonofo-h2-fake-improbability-v1";
+  const FAKE_H2_DEFAULT=[
+    "One of the most improbable discoveries was, of course, the practical application of the Force of Improbability. Not just the theory, misunderstood by gamblers since the dawn of time, but actual uses for it.",
+    "Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects. Needless to say, it has its dangers, as evidenced by the well-documented series of kitchen explosions in Bloomington Illinois, but since the publication of Gottlieb’s “Improbability: Certain ways to Use It in The Home and Workshop” home experimentation has really taken off.",
+    "The trick is, of course, to just cast one’s fate to the wind and simply ride on it."
+  ];
+  function fakeH2Paras(){
+    try{
+      const saved=JSON.parse(localStorage.getItem(FAKE_H2_KEY)||"null");
+      if(Array.isArray(saved)&&saved.length)return saved;
+    }catch(e){}
+    return [...FAKE_H2_DEFAULT];
+  }
   ov.innerHTML=`<div class="top"><button id="sx">CANCEL</button><div class="title"><b>Search</b></div></div>
     <form id="searchForm" class="searchbar">
       <input id="secretSearch" autocomplete="off" autocapitalize="none" spellcheck="false"
@@ -493,17 +506,29 @@ function openH2G2Search(){
     $("#improbResult").onclick=showFakePage;
   }
   function showFakePage(){
+    const paras=fakeH2Paras();
     ov.innerHTML=`<div class="top"><button id="fakeContents">CONTENTS</button><div class="title">${esc(state.book.title)} · Force of Improbability</div><button id="fakeEdit">EDIT</button></div>
       <div class="reader">
         <div class="page">
           <h1>Force of Improbability</h1>
-          <p>One of the most improbable discoveries was, of course, the practical application of the Force of Improbability. Not just the theory, misunderstood by gamblers since the dawn of time, but actual uses for it.</p>
-          <p>Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects. Needless to say, it has its dangers, as evidenced by the well-documented series of kitchen explosions in Bloomington Illinois, but since the publication of Gottlieb’s “Improbability: Certain ways to Use It in The Home and Workshop” home experimentation has really taken off.</p>
-          <p>The trick is, of course, to just cast one’s fate to the wind and simply ride on it.</p>
+          ${paras.map(x=>`<p>${esc(x)}</p>`).join("")}
         </div>
       </div>`;
     $("#fakeContents").onclick=()=>ov.remove();
-    $("#fakeEdit").onclick=()=>{};
+    $("#fakeEdit").onclick=()=>{
+      const editor=document.createElement("div");editor.className="editor";
+      editor.innerHTML=`<div class="row"><b>IMPROBABILITY EDITOR</b><span style="flex:1"></span><button id="fakeCancelEdit">CLOSE</button></div>
+        <textarea id="fakePageText">${esc(fakeH2Paras().join("\n\n"))}</textarea>
+        <div class="row"><button id="fakeSaveEdit">SAVE PAGE</button></div>`;
+      ov.appendChild(editor);
+      $("#fakeCancelEdit").onclick=()=>editor.remove();
+      $("#fakeSaveEdit").onclick=()=>{
+        const saved=$("#fakePageText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+        if(saved.length)localStorage.setItem(FAKE_H2_KEY,JSON.stringify(saved));
+        editor.remove();
+        showFakePage();
+      };
+    };
   }
   function submit(){
     const w=inp.value.trim();
