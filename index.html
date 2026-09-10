@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.14R">
-<!-- NOBO NOFO BUILD: v6.14R -->
+<meta name="nobonofo-build" content="v6.15R">
+<!-- NOBO NOFO BUILD: v6.15R -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -522,18 +522,23 @@ function jobsMixedCase(s){
   return s.toLowerCase().replace(/(^|[\s—–-])([a-z])/g,(m,p,c)=>p+c.toUpperCase());
 }
 
-function jobsOpeningHTML(ch,paras){
+function jobsOpeningHTML(ch,paras,genuineParas){
   const parts=String(ch.title||"").split(/\s+[—–-]\s+/,2);
   const chapNo=parts[0]||"";
   const chapTitle=parts[1]||"";
+  const source=Array.isArray(genuineParas)?genuineParas:paras;
   let n=0;
-  while(n<paras.length){
-    const wc=String(paras[n]).trim().split(/\s+/).filter(Boolean).length;
+  while(n<source.length){
+    const wc=String(source[n]).trim().split(/\s+/).filter(Boolean).length;
     if(wc>18)break;
     n++;
   }
-  const heads=paras.slice(0,n);
-  const body=paras.slice(n);
+  const heads=source.slice(0,n);
+  const body=[...paras];
+  for(const h of heads){
+    const ix=body.indexOf(h);
+    if(ix>=0)body.splice(ix,1);
+  }
   const headHTML=`<div class="jobsOpen">
     <div class="jobsChapNo">${esc(jobsMixedCase(chapNo))}</div>
     <div class="jobsChapTitle">${esc(jobsMixedCase(chapTitle))}</div>
@@ -696,7 +701,7 @@ function render(){
   let openingHTML=p.opener?`<h1>${esc(ch.title)}</h1>`:"";
   let bodyParas=shown;
   if(p.opener && state.book.id==="jobs"){
-    const j=jobsOpeningHTML(ch,shown);
+    const j=jobsOpeningHTML(ch,shown,p.paragraphs);
     openingHTML=j.headHTML;
     bodyParas=j.body;
   }
