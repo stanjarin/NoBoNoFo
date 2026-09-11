@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.16R">
-<!-- NOBO NOFO BUILD: v6.16R -->
+<meta name="nobonofo-build" content="v6.17R">
+<!-- NOBO NOFO BUILD: v6.17R -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -288,7 +288,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.16R";
+const BUILD_VERSION="v6.17R";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
 let browseMode=localStorage.getItem(BROWSEKEY)==="1";
@@ -526,15 +526,52 @@ function openH2G2Search(){
       editor.innerHTML=`<div class="row"><b>IMPROBABILITY EDITOR</b><span style="flex:1"></span><button id="fakeCancelEdit">CLOSE</button></div>
         <label>Page title <input id="fakePageTitle" value="${esc(fakeH2Title())}"></label>
         <textarea id="fakePageText">${esc(fakeH2Paras().join("\n\n"))}</textarea>
-        <div class="row"><button id="fakeSaveEdit">SAVE PAGE</button></div>`;
+        <div class="row"><button id="fakeSaveEdit">SAVE PAGE</button><button id="fakeExportEdit">EXPORT H2</button><button id="fakeImportEdit">IMPORT H2</button></div>`;
       ov.appendChild(editor);
       $("#fakeCancelEdit").onclick=()=>editor.remove();
+      const collectFakeH2=()=>({
+        type:"nobonofo-h2-fake-improbability",
+        version:1,
+        title:$("#fakePageTitle").value.trim(),
+        paragraphs:$("#fakePageText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean)
+      });
+      const saveFakeH2=data=>{
+        localStorage.setItem(FAKE_H2_TITLE_KEY,String(data.title??""));
+        if(Array.isArray(data.paragraphs)&&data.paragraphs.length){
+          localStorage.setItem(FAKE_H2_KEY,JSON.stringify(data.paragraphs));
+        }
+      };
       $("#fakeSaveEdit").onclick=()=>{
-        const saved=$("#fakePageText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-        localStorage.setItem(FAKE_H2_TITLE_KEY,$("#fakePageTitle").value.trim());
-        if(saved.length)localStorage.setItem(FAKE_H2_KEY,JSON.stringify(saved));
+        saveFakeH2(collectFakeH2());
         editor.remove();
         showFakePage();
+      };
+      $("#fakeExportEdit").onclick=()=>{
+        const data=collectFakeH2();
+        saveFakeH2(data);
+        const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+        const a=document.createElement("a");
+        a.href=URL.createObjectURL(blob);
+        a.download="h2g2_IMPROBABILITY_EDITED.json";
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+      };
+      $("#fakeImportEdit").onclick=()=>{
+        const input=document.createElement("input");
+        input.type="file"; input.accept=".json,application/json";
+        input.onchange=async()=>{
+          const file=input.files?.[0]; if(!file)return;
+          try{
+            const data=JSON.parse(await file.text());
+            if(data?.type!=="nobonofo-h2-fake-improbability" || !Array.isArray(data.paragraphs)){
+              throw new Error("Not a NoBo fake H2 export");
+            }
+            saveFakeH2(data);
+            editor.remove();
+            showFakePage();
+          }catch(e){ alert("Import failed: "+e.message); }
+        };
+        input.click();
       };
     };
   }
@@ -661,7 +698,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.16R</div>
+        <div class="libraryV6">v6.17R</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
