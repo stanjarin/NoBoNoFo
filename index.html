@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.17R">
-<!-- NOBO NOFO BUILD: v6.17R -->
+<meta name="nobonofo-build" content="v6.18R">
+<!-- NOBO NOFO BUILD: v6.18R -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -288,7 +288,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.17R";
+const BUILD_VERSION="v6.18R";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
 let browseMode=localStorage.getItem(BROWSEKEY)==="1";
@@ -460,7 +460,7 @@ function pageMove(d){
     setTimeout(finish,220);
   }else finish();
 }
-function openH2G2Search(){
+async function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
   const FAKE_H2_KEY="nobonofo-h2-fake-improbability-v1";
@@ -471,16 +471,28 @@ function openH2G2Search(){
     "Loosely unrelated to the Uncertainty Principle, improbability when properly harnessed has many startling effects. Needless to say, it has its dangers, as evidenced by the well-documented series of kitchen explosions in Bloomington Illinois, but since the publication of Gottlieb’s “Improbability: Certain ways to Use It in The Home and Workshop” home experimentation has really taken off.",
     "The trick is, of course, to just cast one’s fate to the wind and simply ride on it."
   ];
+  let fakeH2CanonicalTitle=FAKE_H2_DEFAULT_TITLE;
+  let fakeH2CanonicalParas=[...FAKE_H2_DEFAULT];
+  try{
+    const r=await fetch("h2g2_IMPROBABILITY_EDITED.json",{cache:"no-store"});
+    if(r.ok){
+      const shipped=await r.json();
+      if(shipped?.type==="nobonofo-h2-fake-improbability" && Array.isArray(shipped.paragraphs) && shipped.paragraphs.length){
+        fakeH2CanonicalTitle=String(shipped.title??"");
+        fakeH2CanonicalParas=shipped.paragraphs.map(x=>String(x));
+      }
+    }
+  }catch(e){}
   function fakeH2Title(){
     const saved=localStorage.getItem(FAKE_H2_TITLE_KEY);
-    return saved===null?FAKE_H2_DEFAULT_TITLE:saved;
+    return saved===null?fakeH2CanonicalTitle:saved;
   }
   function fakeH2Paras(){
     try{
       const saved=JSON.parse(localStorage.getItem(FAKE_H2_KEY)||"null");
       if(Array.isArray(saved)&&saved.length)return saved;
     }catch(e){}
-    return [...FAKE_H2_DEFAULT];
+    return [...fakeH2CanonicalParas];
   }
   ov.innerHTML=`<div class="top"><button id="sx">CANCEL</button><div class="title"><b>Search</b></div></div>
     <form id="searchForm" class="searchbar">
@@ -554,6 +566,7 @@ function openH2G2Search(){
         a.href=URL.createObjectURL(blob);
         a.download="h2g2_IMPROBABILITY_EDITED.json";
         a.click();
+        alert("EXPORTED: h2g2_IMPROBABILITY_EDITED.json");
         setTimeout(()=>URL.revokeObjectURL(a.href),1000);
       };
       $("#fakeImportEdit").onclick=()=>{
@@ -698,7 +711,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.17R</div>
+        <div class="libraryV6">v6.18R</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
