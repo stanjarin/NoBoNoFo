@@ -540,7 +540,8 @@ async function openH2G2Search(){
       <b>Brownian Motion</b>
       <small>A useful source of random motion; hot tea has figured prominently in several experiments involving improbability.</small>
     </div>`;
-    $("#improbResult").onclick=showFakePage;
+    const improbResult=res.querySelector("#improbResult");
+    if(improbResult)improbResult.onclick=showFakePage;
   }
   function showFakePage(){
     const paras=fakeH2Paras(),title=fakeH2Title();
