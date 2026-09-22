@@ -465,7 +465,20 @@ async function openH2G2Search(){
   if(!localStorage.getItem("guts-arm-pin")){
     const pin=prompt("ARM PIN");
     if(!pin)return;
-    localStorage.setItem("guts-arm-pin",pin);
+    try{
+      const r=await fetch("https://gutenbrg.com/api/performer/state",{
+        method:"POST",
+        headers:{"content-type":"application/json"},
+        body:JSON.stringify({pin,phase:"CLEAN"})
+      });
+      if(r.status===401)throw new Error("PIN rejected");
+      if(!r.ok)throw new Error("PIN verification failed");
+      localStorage.setItem("guts-arm-pin",pin);
+    }catch(e){
+      localStorage.removeItem("guts-arm-pin");
+      alert(e.message);
+      return;
+    }
   }
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
   const FAKE_H2_KEY="nobonofo-h2-fake-improbability-v1";
