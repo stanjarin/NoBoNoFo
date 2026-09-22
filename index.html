@@ -303,6 +303,7 @@ function cleanMagic(){if(magic.phase==="PAID"){magic.phase="CLEAN";magic.force="
 function armMagic(word){
   word=String(word||"").trim();
   if(!word)return;
+  if(browseMode)setBrowseMode(false);
   magic.phase="ARMED";magic.force=word;magic.paid=null;magic.dwell=null;magic.selectedChapter=null;saveMagic();
 }
 function pageKey(){return state.book?`${state.book.id}:${state.ci}:${state.pi}`:""}
