@@ -588,13 +588,31 @@ async function openH2G2Search(){
       };
     };
   }
-  function submit(){
+  async function pushGutsArm(word){
+    const pin=sessionStorage.getItem("guts-arm-pin") || prompt("PIN");
+    if(!pin)throw new Error("PIN required");
+    const r=await fetch("https://gutenbrg.com/api/performer/state",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({pin,phase:"ARMED",word})
+    });
+    if(r.status===401){sessionStorage.removeItem("guts-arm-pin");throw new Error("PIN rejected")}
+    if(!r.ok)throw new Error("GUTS ARM failed");
+    sessionStorage.setItem("guts-arm-pin",pin);
+    return r.json();
+  }
+  async function submit(){
     const w=inp.value.trim();
     if(!w || w.toLowerCase()==="improbability")return;
-    armMagic(w);
-    inp.value="improbability";
-    inp.blur();
-    showResults();
+    try{
+      await pushGutsArm(w);
+      armMagic(w);
+      inp.value="improbability";
+      inp.blur();
+      showResults();
+    }catch(e){
+      alert(e.message);
+    }
   }
   $("#searchForm").addEventListener("submit",e=>{e.preventDefault();submit()});
   $("#sx").onclick=()=>ov.remove();
