@@ -115,7 +115,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .top,.top *, .contentsHead, .contentsHead *, .chapter,
 .searchOverlay,.searchOverlay *, .adminPanel,.adminPanel *,
 .importLabel,.libraryScreen{
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
 }
 
 
@@ -132,7 +132,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
   padding:10px !important;
   display:flex !important;
   align-items:center;
-  gap:8px;
+  gap:5px;
   -webkit-user-select:none;
   user-select:none;
   -webkit-touch-callout:none;
@@ -140,7 +140,7 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .adminPanel button,.adminPanel .importLabel{
   appearance:none;-webkit-appearance:none;
   border:1px solid #999;background:#fff;color:#222;
-  border-radius:7px;padding:9px 12px;font-size:12px;line-height:1;
+  border-radius:7px;padding:8px 7px;font-family:"Helvetica Neue Condensed","Arial Narrow","Helvetica Neue",sans-serif;font-stretch:condensed;font-size:11px;line-height:1;white-space:nowrap;
 }
 .adminPanel input[type=file]{display:none}
 
@@ -767,12 +767,25 @@ function render(){
         at=null;
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
-        panel.innerHTML=`<button id="resetTest">RESET</button><button id="browseToggle">BROWSE ${browseMode?"ON":"OFF"}</button><button id="armAuth">ARM AUTH ${localStorage.getItem("guts-arm-pin")?"ON":"OFF"}</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLEAR DATA</button><button id="closeAdmin">CLOSE</button>`;
+        panel.innerHTML=`<button id="resetTest">RSET</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="armAuth">ARM ${localStorage.getItem("guts-arm-pin")?"ON":"OFF"}</button><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLR</button><button id="showToggle">SHW …</button><button id="closeAdmin">X</button>`;
         app.appendChild(panel);
         $("#resetTest").onclick=()=>resetMagic();
-        $("#browseToggle").onclick=()=>setBrowseMode(!browseMode);
-        $("#armAuth").onclick=()=>{localStorage.removeItem("guts-arm-pin");$("#armAuth").textContent="ARM AUTH OFF"};
+        $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−")};
+        $("#armAuth").onclick=()=>{localStorage.removeItem("guts-arm-pin");$("#armAuth").textContent="ARM OFF"};
         $("#fileInput").onchange=importBook;
+        const showBtn=$("#showToggle");
+        let siteMode="SHOW";
+        fetch("https://gutenbrg.com/api/performer/mode",{credentials:"include"}).then(r=>r.json()).then(j=>{siteMode=j.mode==="REHEARSAL"?"REHEARSAL":"SHOW";showBtn.textContent=siteMode==="SHOW"?"SHW ON":"SHW OFF"}).catch(()=>{showBtn.textContent="SHW ?"});
+        showBtn.onclick=async()=>{
+          const pin=prompt("SHOW PIN");
+          if(pin===null)return;
+          const next=siteMode==="SHOW"?"REHEARSAL":"SHOW";
+          try{
+            const r=await fetch("https://gutenbrg.com/api/performer/mode",{method:"POST",credentials:"include",headers:{"content-type":"application/json"},body:JSON.stringify({pin,mode:next})});
+            if(!r.ok){alert(r.status===401?"PIN rejected":"SHOW control failed");return;}
+            const j=await r.json();siteMode=j.mode;showBtn.textContent=siteMode==="SHOW"?"SHW ON":"SHW OFF";
+          }catch(e){alert("SHOW control failed");}
+        };
         $("#clearBooks").onclick=()=>{
           if(confirm("Clear all imported/edited NoBo book data stored on this device? Shipped GitHub books and magic RESET state are untouched.")) clearImportedBookData();
         };
