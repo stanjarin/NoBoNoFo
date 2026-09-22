@@ -767,10 +767,11 @@ function render(){
         at=null;
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
-        panel.innerHTML=`<button id="resetTest">RESET</button><button id="browseToggle">BROWSE ${browseMode?"ON":"OFF"}</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLEAR DATA</button><button id="closeAdmin">CLOSE</button>`;
+        panel.innerHTML=`<button id="resetTest">RESET</button><button id="browseToggle">BROWSE ${browseMode?"ON":"OFF"}</button><button id="armAuth">ARM AUTH ${localStorage.getItem("guts-arm-pin")?"ON":"OFF"}</button><label class="importLabel">IMPORT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLEAR DATA</button><button id="closeAdmin">CLOSE</button>`;
         app.appendChild(panel);
         $("#resetTest").onclick=()=>resetMagic();
         $("#browseToggle").onclick=()=>setBrowseMode(!browseMode);
+        $("#armAuth").onclick=()=>{localStorage.removeItem("guts-arm-pin");$("#armAuth").textContent="ARM AUTH OFF"};
         $("#fileInput").onchange=importBook;
         $("#clearBooks").onclick=()=>{
           if(confirm("Clear all imported/edited NoBo book data stored on this device? Shipped GitHub books and magic RESET state are untouched.")) clearImportedBookData();
