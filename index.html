@@ -462,10 +462,10 @@ function pageMove(d){
 }
 async function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
-  if(!sessionStorage.getItem("guts-arm-pin")){
+  if(!localStorage.getItem("guts-arm-pin")){
     const pin=prompt("ARM PIN");
     if(!pin)return;
-    sessionStorage.setItem("guts-arm-pin",pin);
+    localStorage.setItem("guts-arm-pin",pin);
   }
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
   const FAKE_H2_KEY="nobonofo-h2-fake-improbability-v1";
@@ -594,16 +594,16 @@ async function openH2G2Search(){
     };
   }
   async function pushGutsArm(word){
-    const pin=sessionStorage.getItem("guts-arm-pin");
+    const pin=localStorage.getItem("guts-arm-pin");
     if(!pin)throw new Error("ARM not preactivated");
     const r=await fetch("https://gutenbrg.com/api/performer/state",{
       method:"POST",
       headers:{"content-type":"application/json"},
       body:JSON.stringify({pin,phase:"ARMED",word})
     });
-    if(r.status===401){sessionStorage.removeItem("guts-arm-pin");throw new Error("PIN rejected")}
+    if(r.status===401){localStorage.removeItem("guts-arm-pin");throw new Error("PIN rejected")}
     if(!r.ok)throw new Error("GUTS ARM failed");
-    sessionStorage.setItem("guts-arm-pin",pin);
+    localStorage.setItem("guts-arm-pin",pin);
     return r.json();
   }
   async function submit(){
