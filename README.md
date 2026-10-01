@@ -1,3 +1,7 @@
+# START HERE
+
+Fresh ewe: read `NOBO_HANDOVER_2026-10-02.md` first, then this README.
+
 # NoBo NoFo — control/protocol refresh
 
 Working branch: `controls-refresh-2026-10-01`
