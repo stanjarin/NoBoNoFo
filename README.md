@@ -27,3 +27,8 @@ For safe QA this branch talks to the GUTS branch preview:
 `https://protocol-cleanup-2026-10-01-guts.stanjarin.workers.dev`
 
 Do not merge to `main` until phone QA passes.
+
+
+## Phone QA PASS — 2026-10-02
+
+Passed on iPhone: [WORD] persists across books and HIDD/SHW; refresh preserves it; 6+ second dwell/departure reaches PAID; RSET clears the paid/armed word from GUTS. Protocol cleanup PASSED on test branches. Main remains untouched pending promotion.
