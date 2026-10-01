@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.18S-test">
-<!-- NOBO NOFO BUILD: v6.18S-test -->
+<meta name="nobonofo-build" content="v6.19C">
+<!-- NOBO NOFO BUILD: v6.19C -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -143,6 +143,11 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
   border-radius:7px;padding:8px 7px;font-family:"Helvetica Neue Condensed","Arial Narrow","Helvetica Neue",sans-serif;font-stretch:condensed;font-size:11px;line-height:1;white-space:nowrap;
 }
 .adminPanel input[type=file]{display:none}
+.adminPanel{flex-wrap:wrap}
+.adminStatus{padding:6px 2px;font:700 11px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;white-space:nowrap}
+.adminGood{color:#16823b}
+.adminBad{color:#b42318}
+.adminData{display:flex;gap:5px;align-items:center}
 
 
 /* 5I — MORE is a genuine control above a non-interactive base image */
@@ -288,7 +293,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.18S-test";
+const BUILD_VERSION="v6.19C";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
 let browseMode=localStorage.getItem(BROWSEKEY)==="1";
@@ -299,7 +304,7 @@ if(sessionStorage.getItem(MAGICKEY)===null){
 const magic=Object.assign({phase:"READY",force:"",paid:null,dwell:null,selectedChapter:null},JSON.parse(sessionStorage.getItem(MAGICKEY)||"{}"));
 function saveMagic(){sessionStorage.setItem(MAGICKEY,JSON.stringify(magic))}
 function resetMagic(){Object.assign(magic,{phase:"READY",force:"",paid:null,dwell:null,selectedChapter:null});saveMagic();goLibrary()}
-function cleanMagic(){if(magic.phase==="PAID"){magic.phase="CLEAN";magic.force="";saveMagic();render()}}
+// CLEAN is retained only in Git history / remote protocol. It has no live NoBo control.
 function armMagic(word){
   word=String(word||"").trim();
   if(!word)return;
@@ -386,7 +391,7 @@ function saveLocal(){
   if(!state.book)return;
   localStorage.setItem(key(state.book.id),JSON.stringify(state.book));
 }
-function clearImportedBookData(){
+function deportImportedBookData(){
   const prefix=`nobonofo-edits-${EDIT_SCHEMA}-`;
   const doomed=[];
   for(let i=0;i<localStorage.length;i++){
@@ -395,7 +400,32 @@ function clearImportedBookData(){
   }
   doomed.forEach(k=>localStorage.removeItem(k));
   cache.clear();
-  alert(`Cleared ${doomed.length} imported/edited NoBo book${doomed.length===1?"":"s"}.`);
+  alert(`Deported ${doomed.length} local NoBo book override${doomed.length===1?"":"s"}.`);
+}
+function exportStoredBookData(){
+  const prefix=`nobonofo-edits-${EDIT_SCHEMA}-`;
+  const found=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k && k.startsWith(prefix))found.push(k);
+  }
+  if(!found.length){alert("No local edited book data to export.");return}
+  const ids=found.map(k=>k.slice(prefix.length)).sort();
+  let id=ids[0];
+  if(ids.length>1){
+    const pick=prompt("EXPORT BOOK — enter ID:\n"+ids.join(" · "),id);
+    if(pick===null)return;
+    id=String(pick).trim();
+    if(!ids.includes(id)){alert("No local edited book with that ID.");return}
+  }
+  const raw=localStorage.getItem(prefix+id);
+  if(!raw)return;
+  const blob=new Blob([raw],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`${id}_EDITED.json`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function currentPage(){return state.book.chapters[state.ci].pages[state.pi]}
@@ -749,7 +779,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.18S-test</div>
+        <div class="libraryV6">v6.19C</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
@@ -767,15 +797,21 @@ function render(){
         at=null;
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
-        panel.innerHTML=`<button id="resetTest">RSET</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="armAuth">ARM ${localStorage.getItem("guts-arm-pin")?"ON":"OFF"}</button><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="clearBooks">CLR</button><button id="showToggle">SHW …</button><button id="closeAdmin">X</button>`;
+        const readyOK=magic.phase==="READY";
+        const pinOK=!!localStorage.getItem("guts-arm-pin");
+        panel.innerHTML=`<button id="resetTest">RSET</button><button id="showToggle">SHW …</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="dataToggle">DATA</button><span class="adminStatus ${readyOK?"adminGood":"adminBad"}">READY ${readyOK?"√":"X"}</span><span class="adminStatus ${pinOK?"adminGood":"adminBad"}">PIN</span><button id="closeAdmin">&gt;</button><span id="dataActions" class="adminData hidden"><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="exportStored">EXPRT</button><button id="deportBooks">DEPRT</button></span>`;
         app.appendChild(panel);
         $("#resetTest").onclick=()=>resetMagic();
         $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−")};
-        $("#armAuth").onclick=()=>{localStorage.removeItem("guts-arm-pin");$("#armAuth").textContent="ARM OFF"};
+        $("#dataToggle").onclick=()=>$("#dataActions").classList.toggle("hidden");
         $("#fileInput").onchange=importBook;
+        $("#exportStored").onclick=exportStoredBookData;
+        $("#deportBooks").onclick=()=>{
+          if(confirm("DEPORT all local imported/edited NoBo book overrides from this device? Shipped GitHub books and magic state are untouched.")) deportImportedBookData();
+        };
         const showBtn=$("#showToggle");
         let siteMode="SHOW";
-        fetch("https://gutenbrg.com/api/performer/mode",{credentials:"include"}).then(r=>r.json()).then(j=>{siteMode=j.mode==="REHEARSAL"?"REHEARSAL":"SHOW";showBtn.textContent=siteMode==="SHOW"?"SHW ON":"SHW OFF"}).catch(()=>{showBtn.textContent="SHW ?"});
+        fetch("https://gutenbrg.com/api/performer/mode",{credentials:"include"}).then(r=>r.json()).then(j=>{siteMode=j.mode==="REHEARSAL"?"REHEARSAL":"SHOW";showBtn.textContent=siteMode==="SHOW"?"SHW":"HIDD"}).catch(()=>{showBtn.textContent="?"});
         showBtn.onclick=async()=>{
           const pin=prompt("SHOW PIN");
           if(pin===null)return;
@@ -783,11 +819,8 @@ function render(){
           try{
             const r=await fetch("https://gutenbrg.com/api/performer/mode",{method:"POST",credentials:"include",headers:{"content-type":"application/json"},body:JSON.stringify({pin,mode:next})});
             if(!r.ok){alert(r.status===401?"PIN rejected":"SHOW control failed");return;}
-            const j=await r.json();siteMode=j.mode;showBtn.textContent=siteMode==="SHOW"?"SHW ON":"SHW OFF";
+            const j=await r.json();siteMode=j.mode;showBtn.textContent=siteMode==="SHOW"?"SHW":"HIDD";
           }catch(e){alert("SHOW control failed");}
-        };
-        $("#clearBooks").onclick=()=>{
-          if(confirm("Clear all imported/edited NoBo book data stored on this device? Shipped GitHub books and magic RESET state are untouched.")) clearImportedBookData();
         };
         $("#closeAdmin").onclick=()=>panel.remove();
       },1200);
@@ -864,25 +897,8 @@ function render(){
     }
   },{passive:true});
 
-  // Hidden PAID -> CLEAN purge: deliberate 1.2 s long-press on EDIT.
-  // EDIT remains a normal short-tap editor control; long-press while PAID silently purges.
-  const editBtn=$("#edit");
-  let cleanTimer=null, cleanFired=false;
-  const cancelClean=()=>{if(cleanTimer){clearTimeout(cleanTimer);cleanTimer=null;}};
-  editBtn.addEventListener("touchstart",e=>{
-    if(magic.phase!=="PAID" || e.touches.length!==1)return;
-    cleanFired=false;
-    cleanTimer=setTimeout(()=>{
-      cleanTimer=null; cleanFired=true; cleanMagic();
-    },1200);
-  },{passive:true});
-  editBtn.addEventListener("touchmove",cancelClean,{passive:true});
-  editBtn.addEventListener("touchend",cancelClean,{passive:true});
-  editBtn.addEventListener("touchcancel",cancelClean,{passive:true});
-  editBtn.onclick=e=>{
-    if(cleanFired){cleanFired=false; e.preventDefault(); return;}
-    openEditor();
-  };
+  // EDIT is single-purpose: open the editor. CLEAN has no live gesture.
+  $("#edit").onclick=openEditor;
 
   beginDwell();
 }
