@@ -1,19 +1,27 @@
-# NoBo NoFo — v.5M
+# NoBo NoFo — control-panel refresh
 
-W3 DATA FIX — prepared socket on every page.
+Working branch: `controls-refresh-2026-10-01`
 
-- Removes the bad v.5L runtime repeated-graft approach by returning to the v.5K engine.
-- Every one of the 9,761 shipped logical pages now has its own force_paragraphs.
-- Each prepared page is based on that page's own genuine prose; the socket is inserted into a sentence already on that page.
-- Existing hand-authored Pass 4 sockets are preserved.
-- Genuine paragraphs are untouched underneath.
-- PAID / CLEAN machinery is unchanged.
-- Keyboard fix retained.
-- W1 cover slide remains deferred.
+`main` remains untouched at `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`.
 
-VERIFIED:
-- pages checked: 9,761
-- pages missing a $$$ socket: 0
-- total $$$ sockets: 9,762
+## Current branch build
 
-BOOKS CHANGED.
+**v6.19C**
+
+Normal live magic flow:
+
+`READY → ARMED → PAID → RSET`
+
+- **RSET** clears local magic state, returns to Library, and sends the existing internal GUTS `CLEAN` reset signal when the performer PIN is available.
+- The former NoBo **CLEAN** state/EDIT long-press control is inactive; CLEAN survives only as the internal GUTS reset protocol term.
+- **SHW / HIDD** displays the current GUTS site mode and toggles it.
+- **BR− / BR+** displays the current Browse state and toggles it.
+- **DATA** exposes **IMPRT / EXPRT / DEPRT**.
+- **READY √ / X** is a passive local magic-state indicator.
+- **PIN** is a passive credential indicator: green when a validated ARM PIN is stored, red when none is stored.
+- **>** closes the control panel.
+- **EDIT** is single-purpose again: ordinary tap opens the editor.
+
+## Safety
+
+All work is confined to the branch above. Do not merge to `main` until phone QA passes.
