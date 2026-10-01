@@ -95,3 +95,10 @@ Promotion/deployment only:
 6. freeze release.
 
 Do not repeat the whole QA campaign unless a regression appears.
+
+## Promotion anchors — 2 October 2026
+
+- phone-QA frozen NoBo anchor: `qa-pass-2026-10-02` @ `bb5de0ef986f42a0d89497c08995e5f243c223da`
+- pre-promotion NoBo rollback: `rollback-pre-promotion-2026-10-02` @ `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`
+- paired phone-QA GUTS anchor: `59b6e1015cc7ff8bc51bedbd1a874d974b6710b5`
+- promotion scope remains deployment only.
