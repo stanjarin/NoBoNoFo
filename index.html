@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#f4f0e7">
-<meta name="nobonofo-build" content="v6.19C">
-<!-- NOBO NOFO BUILD: v6.19C -->
+<meta name="nobonofo-build" content="v6.20P">
+<!-- NOBO NOFO BUILD: v6.20P -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/NOBO_ICON.png">
 <title>NoBo NoFo — Nine Book Reader</title>
@@ -293,7 +293,9 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.19C";
+const BUILD_VERSION="v6.20P";
+const GUTS_BASE="https://protocol-cleanup-2026-10-01-guts.stanjarin.workers.dev";
+const PIN_VALID_KEY="guts-arm-pin-valid";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
 let browseMode=localStorage.getItem(BROWSEKEY)==="1";
@@ -303,20 +305,34 @@ if(sessionStorage.getItem(MAGICKEY)===null){
 }
 const magic=Object.assign({phase:"READY",force:"",paid:null,dwell:null,selectedChapter:null},JSON.parse(sessionStorage.getItem(MAGICKEY)||"{}"));
 function saveMagic(){sessionStorage.setItem(MAGICKEY,JSON.stringify(magic))}
+function clearGutsPin(){
+  localStorage.removeItem("guts-arm-pin");
+  localStorage.removeItem(PIN_VALID_KEY);
+}
+async function validateGutsPin(pin){
+  const r=await fetch(GUTS_BASE+"/api/performer/validate",{
+    method:"POST",
+    headers:{"content-type":"application/json"},
+    body:JSON.stringify({pin})
+  });
+  if(r.status===401){clearGutsPin();throw new Error("PIN rejected")}
+  if(!r.ok){localStorage.removeItem(PIN_VALID_KEY);throw new Error("PIN validation failed")}
+  localStorage.setItem("guts-arm-pin",pin);
+  localStorage.setItem(PIN_VALID_KEY,"1");
+  return true;
+}
 async function resetGuts(){
   const pin=localStorage.getItem("guts-arm-pin");
   if(!pin)return;
   try{
-    const r=await fetch("https://gutenbrg.com/api/performer/state",{
+    const r=await fetch(GUTS_BASE+"/api/performer/state",{
       method:"POST",
       headers:{"content-type":"application/json"},
-      body:JSON.stringify({pin,phase:"CLEAN"})
+      body:JSON.stringify({pin,phase:"READY"})
     });
-    if(r.status===401){
-      localStorage.removeItem("guts-arm-pin");
-      throw new Error("PIN rejected");
-    }
+    if(r.status===401){clearGutsPin();throw new Error("PIN rejected")}
     if(!r.ok)throw new Error("GUTS reset failed");
+    localStorage.setItem(PIN_VALID_KEY,"1");
   }catch(e){
     alert(e.message);
   }
@@ -327,7 +343,7 @@ function resetMagic(){
   goLibrary();
   resetGuts();
 }
-// CLEAN is retained only as the internal GUTS reset signal. It has no live NoBo state/control.
+// Live NoBo/GUTS protocol is READY / ARMED only; visibility is independent.
 function armMagic(word){
   word=String(word||"").trim();
   if(!word)return;
@@ -516,23 +532,17 @@ function pageMove(d){
 }
 async function openH2G2Search(){
   if(!state.book || state.book.id!=="h2g2" || magic.phase!=="READY")return;
-  if(!localStorage.getItem("guts-arm-pin")){
-    const pin=prompt("ARM PIN");
-    if(!pin)return;
-    try{
-      const r=await fetch("https://gutenbrg.com/api/performer/state",{
-        method:"POST",
-        headers:{"content-type":"application/json"},
-        body:JSON.stringify({pin,phase:"CLEAN"})
-      });
-      if(r.status===401)throw new Error("PIN rejected");
-      if(!r.ok)throw new Error("PIN verification failed");
-      localStorage.setItem("guts-arm-pin",pin);
-    }catch(e){
-      localStorage.removeItem("guts-arm-pin");
-      alert(e.message);
-      return;
-    }
+  let armPin=localStorage.getItem("guts-arm-pin");
+  if(!armPin){
+    armPin=prompt("ARM PIN");
+    if(!armPin)return;
+  }
+  try{
+    await validateGutsPin(armPin);
+  }catch(e){
+    clearGutsPin();
+    alert(e.message);
+    return;
   }
   const app=$("#app"),ov=document.createElement("div");ov.className="searchOverlay";
   const FAKE_H2_KEY="nobonofo-h2-fake-improbability-v1";
@@ -664,14 +674,15 @@ async function openH2G2Search(){
   async function pushGutsArm(word){
     const pin=localStorage.getItem("guts-arm-pin");
     if(!pin)throw new Error("ARM not preactivated");
-    const r=await fetch("https://gutenbrg.com/api/performer/state",{
+    const r=await fetch(GUTS_BASE+"/api/performer/state",{
       method:"POST",
       headers:{"content-type":"application/json"},
       body:JSON.stringify({pin,phase:"ARMED",word})
     });
-    if(r.status===401){localStorage.removeItem("guts-arm-pin");throw new Error("PIN rejected")}
+    if(r.status===401){clearGutsPin();throw new Error("PIN rejected")}
     if(!r.ok)throw new Error("GUTS ARM failed");
     localStorage.setItem("guts-arm-pin",pin);
+    localStorage.setItem(PIN_VALID_KEY,"1");
     return r.json();
   }
   async function submit(){
@@ -802,7 +813,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.19C</div>
+        <div class="libraryV6">v6.20P</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
@@ -821,9 +832,13 @@ function render(){
         document.querySelector(".adminPanel")?.remove();
         const panel=document.createElement("div");panel.className="adminPanel";
         const readyOK=magic.phase==="READY";
-        const pinOK=!!localStorage.getItem("guts-arm-pin");
-        panel.innerHTML=`<button id="resetTest">RSET</button><button id="showToggle">SHW …</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="dataToggle">DATA</button><span class="adminStatus ${readyOK?"adminGood":"adminBad"}">READY ${readyOK?"√":"X"}</span><span class="adminStatus ${pinOK?"adminGood":"adminBad"}">PIN</span><button id="closeAdmin">&gt;</button><span id="dataActions" class="adminData hidden"><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="exportStored">EXPRT</button><button id="deportBooks">DEPRT</button></span>`;
+        const pinOK=!!localStorage.getItem("guts-arm-pin")&&localStorage.getItem(PIN_VALID_KEY)==="1";
+        panel.innerHTML=`<button id="resetTest">RSET</button><button id="showToggle">SHW …</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="dataToggle">DATA</button><span class="adminStatus ${readyOK?"adminGood":"adminBad"}">READY ${readyOK?"√":"X"}</span><span id="pinStatus" class="adminStatus ${pinOK?"adminGood":"adminBad"}">PIN</span><button id="closeAdmin">&gt;</button><span id="dataActions" class="adminData hidden"><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="exportStored">EXPRT</button><button id="deportBooks">DEPRT</button></span>`;
         app.appendChild(panel);
+        const pinStatus=$("#pinStatus");
+        const paintPin=ok=>{pinStatus.classList.toggle("adminGood",!!ok);pinStatus.classList.toggle("adminBad",!ok)};
+        const storedPin=localStorage.getItem("guts-arm-pin");
+        if(storedPin)validateGutsPin(storedPin).then(()=>paintPin(true)).catch(()=>paintPin(false));else paintPin(false);
         $("#resetTest").onclick=()=>resetMagic();
         $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−")};
         $("#dataToggle").onclick=()=>$("#dataActions").classList.toggle("hidden");
@@ -834,13 +849,13 @@ function render(){
         };
         const showBtn=$("#showToggle");
         let siteMode="SHOW";
-        fetch("https://gutenbrg.com/api/performer/mode",{credentials:"include"}).then(r=>r.json()).then(j=>{siteMode=j.mode==="REHEARSAL"?"REHEARSAL":"SHOW";showBtn.textContent=siteMode==="SHOW"?"SHW":"HIDD"}).catch(()=>{showBtn.textContent="?"});
+        fetch(GUTS_BASE+"/api/performer/mode",{credentials:"include"}).then(r=>r.json()).then(j=>{siteMode=j.mode==="REHEARSAL"?"REHEARSAL":"SHOW";showBtn.textContent=siteMode==="SHOW"?"SHW":"HIDD"}).catch(()=>{showBtn.textContent="?"});
         showBtn.onclick=async()=>{
           const pin=prompt("SHOW PIN");
           if(pin===null)return;
           const next=siteMode==="SHOW"?"REHEARSAL":"SHOW";
           try{
-            const r=await fetch("https://gutenbrg.com/api/performer/mode",{method:"POST",credentials:"include",headers:{"content-type":"application/json"},body:JSON.stringify({pin,mode:next})});
+            const r=await fetch(GUTS_BASE+"/api/performer/mode",{method:"POST",credentials:"include",headers:{"content-type":"application/json"},body:JSON.stringify({pin,mode:next})});
             if(!r.ok){alert(r.status===401?"PIN rejected":"SHOW control failed");return;}
             const j=await r.json();siteMode=j.mode;showBtn.textContent=siteMode==="SHOW"?"SHW":"HIDD";
           }catch(e){alert("SHOW control failed");}
