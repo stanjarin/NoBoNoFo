@@ -6,7 +6,7 @@ Fresh ewe: read `NOBO_HANDOVER_2026-10-02.md` first, then this README.
 
 Working branch: `controls-refresh-2026-10-01`
 
-`main` remains untouched at `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`.
+`main` was promoted on 2 October 2026; pre-promotion rollback is `rollback-pre-promotion-2026-10-02` at `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`.
 
 ## Test build
 
@@ -27,10 +27,10 @@ Live performer protocol:
 - **DATA** exposes IMPRT / EXPRT / DEPRT.
 - **EDIT** is single-purpose.
 
-For safe QA this branch talks to the GUTS branch preview:
-`https://protocol-cleanup-2026-10-01-guts.stanjarin.workers.dev`
+Production controller target:
+`https://ebooks.fyi`
 
-Do not merge to `main` until phone QA passes.
+Phone-QA code is frozen on `qa-pass-2026-10-02`; final production-domain verification and smoke QA are still pending.
 
 
 ## Phone QA PASS — 2026-10-02
