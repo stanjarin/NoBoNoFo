@@ -2,7 +2,7 @@
 
 ## Production safety
 
-Production `main` remains untouched at:
+Production `main` was promoted on 2 October 2026 from the phone-QA passed branch. Pre-promotion rollback remains frozen at:
 
 `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`
 
@@ -67,9 +67,11 @@ H2G2 SEARCH is the covert arm action.
 
 Build: **v6.20P**
 
-This branch currently targets the GUTS protocol test Worker:
+Production NoBo now targets:
 
-`https://protocol-cleanup-2026-10-01-guts.stanjarin.workers.dev`
+`https://ebooks.fyi`
+
+The phone-QA anchor remains preserved on `qa-pass-2026-10-02`; only the production base URL changed after that anchor.
 
 Phone QA PASSED:
 - [WORD] persists across all GUTS books;
@@ -86,13 +88,16 @@ GitHub Pages was manually set to this branch for QA.
 
 ## Next action
 
-Promotion/deployment only:
-1. create rollback point;
-2. promote this tested branch to NoBo `main`;
-3. replace the temporary GUTS preview base with the chosen production GUTS URL;
-4. verify deployed NoBo is calling production GUTS;
-5. run one final production smoke test with GUTS;
-6. freeze release.
+Completed on GitHub:
+1. rollback point created;
+2. tested NoBo branch promoted to `main`;
+3. temporary GUTS preview base replaced with `https://ebooks.fyi`.
+
+Still pending:
+1. externally verify `ebooks.fyi` is serving the promoted production GUTS Worker;
+2. verify deployed NoBo is calling that production GUTS endpoint;
+3. run one final production smoke test with GUTS;
+4. freeze release.
 
 Do not repeat the whole QA campaign unless a regression appears.
 
