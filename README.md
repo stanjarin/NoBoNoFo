@@ -1,27 +1,29 @@
-# NoBo NoFo — control-panel refresh
+# NoBo NoFo — control/protocol refresh
 
 Working branch: `controls-refresh-2026-10-01`
 
 `main` remains untouched at `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`.
 
-## Current branch build
+## Test build
 
-**v6.19C**
+**v6.20P**
 
-Normal live magic flow:
+NoBo is the performer/controller. GUTS executes NoBo's commands.
 
+Live performer protocol:
 `READY → ARMED → PAID → RSET`
 
-- **RSET** clears local magic state, returns to Library, and sends the existing internal GUTS `CLEAN` reset signal when the performer PIN is available.
-- The former NoBo **CLEAN** state/EDIT long-press control is inactive; CLEAN survives only as the internal GUTS reset protocol term.
-- **SHW / HIDD** displays the current GUTS site mode and toggles it.
-- **BR− / BR+** displays the current Browse state and toggles it.
-- **DATA** exposes **IMPRT / EXPRT / DEPRT**.
-- **READY √ / X** is a passive local magic-state indicator.
-- **PIN** is a passive credential indicator: green when a validated ARM PIN is stored, red when none is stored.
-- **>** closes the control panel.
-- **EDIT** is single-purpose again: ordinary tap opens the editor.
+- **RSET** sets NoBo to READY and sends **READY** to GUTS.
+- **ARM** sends **ARMED + force word** to GUTS.
+- **PAID** is local execution state in each reader after the qualified 6-second dwell.
+- **CLEAN is not a live NoBo/GUTS protocol state.**
+- **SHW / HIDD** changes visibility only. It must never alter READY/ARMED/word.
+- **PIN** validates through the non-mutating GUTS `/api/performer/validate` endpoint.
+- The PIN label is green only after successful validation; rejection clears the stored validation.
+- **DATA** exposes IMPRT / EXPRT / DEPRT.
+- **EDIT** is single-purpose.
 
-## Safety
+For safe QA this branch talks to the GUTS branch preview:
+`https://protocol-cleanup-2026-10-01-guts.stanjarin.workers.dev`
 
-All work is confined to the branch above. Do not merge to `main` until phone QA passes.
+Do not merge to `main` until phone QA passes.
