@@ -1134,9 +1134,13 @@ function cwRender(){
   if(p&&cwState.mode==="AIRLOCK"){
     if(ai>=0){
       editText=String(p.force_paragraphs[ai]);
-      const before=p.force_paragraphs?.[ai-1]||"";
-      const after=p.force_paragraphs?.[ai+1]||"";
-      context=`<p><b>GENUINE CONTEXT</b></p><p>${esc(before)}</p><p>⟦ AIRLOCK ⟧</p><p>${esc(after)}</p>`;
+      const genuine=Array.isArray(p.paragraphs)?p.paragraphs:[];
+      const marked=[];
+      for(let gi=0;gi<=genuine.length;gi++){
+        if(gi===ai)marked.push("<p><b>⟦ AIRLOCK HERE ⟧</b></p>");
+        if(gi<genuine.length)marked.push(`<p>${esc(genuine[gi])}</p>`);
+      }
+      context=`<p><b>GENUINE CONTEXT</b></p>${marked.join("")}`;
       if(socketCount!==1)warn=`Socket count on prepared page: ${socketCount}`;
     }else{
       warn="No three-dollar airlock on this page.";
