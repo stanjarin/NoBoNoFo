@@ -1134,8 +1134,8 @@ function cwRender(){
   if(p&&cwState.mode==="AIRLOCK"){
     if(ai>=0){
       editText=String(p.force_paragraphs[ai]);
-      const before=p.paragraphs?.[Math.max(0,ai-1)]||"";
-      const after=p.paragraphs?.[Math.min((p.paragraphs?.length||1)-1,ai)]||"";
+      const before=p.force_paragraphs?.[ai-1]||"";
+      const after=p.force_paragraphs?.[ai+1]||"";
       context=`<p><b>GENUINE CONTEXT</b></p><p>${esc(before)}</p><p>⟦ AIRLOCK ⟧</p><p>${esc(after)}</p>`;
       if(socketCount!==1)warn=`Socket count on prepared page: ${socketCount}`;
     }else{
