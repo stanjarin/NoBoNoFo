@@ -1033,7 +1033,7 @@ const CW_GUTS=[
 {id:"ripley",title:"The Talented Mr. Ripley",author:"Patricia Highsmith",file:"PERFORMANCE10/ripley_performance.json"},
 {id:"ubu",title:"King Ubu (Ubu Roi)",author:"Alfred Jarry",file:"PERFORMANCE10/ubu_performance.json"}
 ];
-const CW_SCHEMA="cw-v1";
+const CW_SCHEMA="cw-v1";const CW_SOCKET="$"+"$"+"$";
 const cwKey=(system,id)=>`${CW_SCHEMA}-${system}-${id}`;
 const cwState={system:"GUTS",mode:"AIRLOCK",meta:[],book:null,ci:0,pi:0,dirty:false};
 
@@ -1054,8 +1054,8 @@ function cwPage(){return cwState.book?.chapters?.[cwState.ci]?.pages?.[cwState.p
 function cwChapter(){return cwState.book?.chapters?.[cwState.ci]}
 function cwAirIndex(p){
   if(!p)return -1;
-  if(Number.isInteger(p.airlock_index)&&p.force_paragraphs?.[p.airlock_index]?.includes("$$"))return p.airlock_index;
-  return Array.isArray(p.force_paragraphs)?p.force_paragraphs.findIndex(x=>String(x).includes("$$")):-1;
+  if(Number.isInteger(p.airlock_index)&&p.force_paragraphs?.[p.airlock_index]?.includes(CW_SOCKET))return p.airlock_index;
+  return Array.isArray(p.force_paragraphs)?p.force_paragraphs.findIndex(x=>String(x).includes(CW_SOCKET)):-1;
 }
 function cwSocketCount(p){
   return Array.isArray(p?.force_paragraphs)?p.force_paragraphs.reduce((n,x)=>n+(String(x).match(/\$\$\$/g)||[]).length,0):0;
@@ -1089,10 +1089,10 @@ function cwSaveEdit(){
   const p=cwPage(),ch=cwChapter();if(!p||!ch)return;
   if(cwState.mode==="AIRLOCK"){
     const i=cwAirIndex(p);
-    if(i<0){alert("No $$ airlock on this page.");return}
+    if(i<0){alert("No three-dollar airlock on this page.");return}
     const text=document.querySelector("#cwText").value.trim();
     const n=(text.match(/\$\$\$/g)||[]).length;
-    if(n!==1){alert("AIRLOCK must contain exactly one $$ socket.");return}
+    if(n!==1){alert("AIRLOCK must contain exactly one three-dollar socket.");return}
     p.force_paragraphs[i]=text;
     p.airlock_index=i;
   }else{
@@ -1139,7 +1139,7 @@ function cwRender(){
       context=`<p><b>GENUINE CONTEXT</b></p><p>${esc(before)}</p><p>⟦ AIRLOCK ⟧</p><p>${esc(after)}</p>`;
       if(socketCount!==1)warn=`Socket count on prepared page: ${socketCount}`;
     }else{
-      warn="No $$ airlock on this page.";
+      warn="No three-dollar airlock on this page.";
       context=(p.paragraphs||[]).map(x=>`<p>${esc(x)}</p>`).join("");
     }
   }else if(p){
