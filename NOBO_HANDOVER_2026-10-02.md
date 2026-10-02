@@ -14,7 +14,7 @@ Paired GUTS branch:
 
 `protocol-cleanup-2026-10-01`
 
-Do not edit `main` casually. Promotion is the next job.
+Do not edit `main` casually. Production release passed and is frozen.
 
 ## Canonical control architecture
 
@@ -86,20 +86,20 @@ Phone QA PASSED:
 
 GitHub Pages was manually set to this branch for QA.
 
-## Next action
+## Release status
 
-Completed on GitHub:
+**PRODUCTION RELEASE PASSED / FROZEN — 2 October 2026**
+
+Completed:
 1. rollback point created;
 2. tested NoBo branch promoted to `main`;
-3. temporary GUTS preview base replaced with `https://ebooks.fyi`.
+3. production target changed to `https://ebooks.fyi`;
+4. `ebooks.fyi` connected to Cloudflare and attached to the production GUTS Worker;
+5. deployed NoBo/GUTS production path verified;
+6. final phone smoke test PASSED:
+   **RSET → ARM → GUTS → prepared page → 6+ sec → PAID persistence → RSET → cleared**.
 
-Still pending:
-1. externally verify `ebooks.fyi` is serving the promoted production GUTS Worker;
-2. verify deployed NoBo is calling that production GUTS endpoint;
-3. run one final production smoke test with GUTS;
-4. freeze release.
-
-Do not repeat the whole QA campaign unless a regression appears.
+Do not repeat the QA campaign unless a specific regression appears.
 
 ## Promotion anchors — 2 October 2026
 
@@ -107,3 +107,14 @@ Do not repeat the whole QA campaign unless a regression appears.
 - pre-promotion NoBo rollback: `rollback-pre-promotion-2026-10-02` @ `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`
 - paired phone-QA GUTS anchor: `59b6e1015cc7ff8bc51bedbd1a874d974b6710b5`
 - promotion scope remains deployment only.
+
+
+## Final production pass — 2 October 2026
+
+Stanley reported **“All systems nominal!”**
+
+Frozen runtime anchor:
+- NoBo `release-2026-10-02-production-pass` @ `6dcd4b33429788f413f6fd80e503f08553eda0cd`
+- paired GUTS `release-2026-10-02-production-pass` @ `4e6c5c4835fb858ba10409962af694657d921d77`
+
+No functional work is open.
