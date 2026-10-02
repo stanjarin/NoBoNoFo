@@ -118,3 +118,93 @@ Frozen runtime anchor:
 - paired GUTS `release-2026-10-02-production-pass` @ `4e6c5c4835fb858ba10409962af694657d921d77`
 
 No functional work is open.
+
+---
+
+# LATEST IMMEDIATE HANDOVER UPDATE — 2 October 2026, wall-hit
+
+**THIS SECTION OVERRIDES EARLIER DATA / EDIT / NEXT-ACTION wording above.**
+
+## Current live NoBo state
+
+Live URL:
+`https://stanjarin.github.io/NoBoNoFo/`
+
+Current workshop runtime commit before handover docs:
+`a59f5bbc18192ebaf11ba44991ce86cfb9cc0dc3`
+
+GitHub Pages source branch `controls-refresh-2026-10-01` was deliberately fast-forwarded to the same runtime commit because Pages was otherwise serving stale DATA behaviour.
+
+Rollback before workshop:
+`rollback-pre-corpus-workshop-2026-10-02`.
+
+## DATA / EDIT now open CORPUS WORKSHOP
+
+The old DATA submenu is superseded.
+
+Entry routes:
+- **Book open → EDIT** opens Corpus Workshop on that current book/chapter/page.
+- **Library → long-press MORE → DATA** opens Corpus Workshop; if no current book exists, GUTS Pooh is the fallback.
+
+Workshop axes:
+- corpuscule: **GUTS / NoBo**
+- operation: **AIRLOCK / CORPUS**
+
+AIRLOCK:
+- shows full genuine page context;
+- marks **⟦ AIRLOCK HERE ⟧**;
+- textarea edits the prepared `$$$` airlock paragraph;
+- exactly one socket required.
+
+CORPUS:
+- edits genuine page text;
+- edits chapter heading;
+- does not automatically repaginate;
+- prepared layer remains separate.
+
+Both modes:
+- **DONE** = accept edit into local workshop copy;
+- **CANCEL** = discard current unsaved edit and redraw;
+- **IMPORT**
+- **EXPORT BOOK**
+- **RESET BOOK**
+- **RETURN TO NOBO**
+
+The workshop is intentionally back-room tooling; no separate home-screen app/icon was created.
+
+## Storage / deployment semantics
+
+Workshop edits are local browser working copies until exported.
+The browser workshop does **not** write directly to GitHub.
+This is intentional current behaviour.
+
+For GUTS books, the workshop loads the canonical JSON from GUTS `main/public/...`.
+For NoBo books, it loads NoBo book JSON.
+
+## Phone checks already seen
+
+Stanley confirmed on iPhone:
+- Corpus Workshop appears;
+- EDIT route can open the current NoBo book/page;
+- GUTS/NoBo and AIRLOCK/CORPUS controls are visible;
+- DONE/CANCEL are visible;
+- AIRLOCK genuine-context preview works;
+- full-page context exposed a real corpus placement issue, which then triggered the GUTS airlock sweep.
+
+This is not yet a formal exhaustive workshop QA campaign.
+
+## Paired GUTS state
+
+GUTS has now completed and promoted a full prepared-layer airlock placement/retention sweep.
+Read GUTS:
+- `GUTS_HANDOVER_2026-10-02.md` latest section;
+- `docs/checkpoints/2026-10-02_airlock-placement-retention-sweep.md`.
+
+The sweep changed prepared corpus only; NoBo runtime/controller machinery was not changed by it.
+
+## Exact next action for fresh ewe
+
+1. Treat current NoBo workshop as the back-room editor.
+2. Do not restore the old EDIT modal or old DATA submenu.
+3. If continuing GUTS work, first complete the pending visual/phone spot-check of the newly repaired GUTS prepared layer.
+4. If continuing workshop work, fix only observed defects; do not redesign the UI gratuitously.
