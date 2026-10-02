@@ -272,6 +272,21 @@ html,body,#app{width:100%;max-width:100%;overflow-x:hidden}
 .searchOverlay .page *{
   font-family:Georgia,"Times New Roman",serif !important;
 }
+
+/* CORPUS WORKSHOP — back-room only */
+.cw{position:fixed;inset:0;z-index:90;background:#ece9df;color:#222;font-family:-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;display:flex;flex-direction:column}
+.cwTop{display:flex;gap:7px;align-items:center;padding:9px;border-bottom:1px solid #aaa;background:#ddd8cc}
+.cwTop b{font-size:14px}.cwTop .sp{flex:1}.cw button,.cw select,.cw input{font:14px -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;padding:7px 8px}
+.cwBar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:8px 9px;border-bottom:1px solid #bbb;background:#f4f1e9}
+.cwBar select{max-width:42vw}.cwStatus{font-size:12px;color:#555}.cwDirty{font-weight:bold;color:#8a4b00}
+.cwBody{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px;gap:8px}
+.cwMeta{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cwContext{max-height:25vh;overflow:auto;background:#fff;border:1px solid #bbb;padding:10px;font:14px/1.4 Georgia,serif}
+.cwContext p{margin:0 0 .7em}.cw textarea{flex:1;min-height:0;width:100%;resize:none;border:1px solid #999;padding:12px;font:16px/1.45 Georgia,serif;background:#fff}
+.cwFoot{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.cwFoot .sp{flex:1}
+.cwWarn{font-size:12px;color:#9a1c1c;font-weight:bold}
+@media(max-width:650px){.cwTop,.cwBar{gap:5px;padding:6px}.cw button,.cw select,.cw input{font-size:12px;padding:6px}.cwBody{padding:7px}.cwContext{max-height:20vh}}
+
 </style>
 </head>
 <body><div id="app"></div>
@@ -841,7 +856,7 @@ function render(){
         if(storedPin)validateGutsPin(storedPin).then(()=>paintPin(true)).catch(()=>paintPin(false));else paintPin(false);
         $("#resetTest").onclick=()=>resetMagic();
         $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−")};
-        $("#dataToggle").onclick=()=>$("#dataActions").classList.toggle("hidden");
+        $("#dataToggle").onclick=openCorpusWorkshop;
         $("#fileInput").onchange=importBook;
         $("#exportStored").onclick=exportStoredBookData;
         $("#deportBooks").onclick=()=>{
@@ -997,6 +1012,177 @@ async function importBook(ev){
   }catch(e){alert("Import failed: "+e.message)}
   ev.target.value="";
 }
+
+const CW_GUTS=[
+{id:"aam",title:"The House at Pooh Corner",author:"A. A. Milne",file:"PERFORMANCE35/aam_035.json"},
+{id:"jeeves",title:"Right Ho, Jeeves!",author:"P. G. Wodehouse",file:"PERFORMANCE35/jeeves_035.json"},
+{id:"farewell",title:"A Farewell to Arms",author:"Ernest Hemingway",file:"PERFORMANCE35/farewell_035.json"},
+{id:"huck",title:"Adventures of Huckleberry Finn",author:"Mark Twain",file:"PERFORMANCE35/huck_035.json"},
+{id:"dr",title:"On Broadway",author:"Damon Runyon",file:"PERFORMANCE35/dr_035.json"},
+{id:"ac",title:"The Murder at the Vicarage",author:"Agatha Christie",file:"PERFORMANCE35/ac_035.json"},
+{id:"jj",title:"Ulysses",author:"James Joyce",file:"PERFORMANCE35/jj_035.json"},
+{id:"jt",title:"My Life and Hard Times",author:"James Thurber",file:"PERFORMANCE35/jt_035.json"},
+{id:"brodie",title:"The Prime of Miss Jean Brodie",author:"Muriel Spark",file:"PERFORMANCE10/brodie_performance.json"},
+{id:"chandler",title:"Farewell, My Lovely",author:"Raymond Chandler",file:"PERFORMANCE10/chandler_performance.json"},
+{id:"keys",title:"The Keys of the Kingdom",author:"A. J. Cronin",file:"PERFORMANCE10/keys_performance.json"},
+{id:"kontiki",title:"The Kon-Tiki Expedition",author:"Thor Heyerdahl",file:"PERFORMANCE10/kontiki_performance.json"},
+{id:"parker",title:"Here Lies: Collected Stories of Dorothy Parker",author:"Dorothy Parker",file:"PERFORMANCE10/parker_performance.json"},
+{id:"peake",title:"Gormenghast",author:"Mervyn Peake",file:"PERFORMANCE10/peake_performance.json"},
+{id:"perelman",title:"The Best of S. J. Perelman",author:"S. J. Perelman",file:"PERFORMANCE10/perelman_performance.json"},
+{id:"policeman",title:"The Third Policeman",author:"Flann O’Brien",file:"PERFORMANCE10/policeman_performance.json"},
+{id:"ripley",title:"The Talented Mr. Ripley",author:"Patricia Highsmith",file:"PERFORMANCE10/ripley_performance.json"},
+{id:"ubu",title:"King Ubu (Ubu Roi)",author:"Alfred Jarry",file:"PERFORMANCE10/ubu_performance.json"}
+];
+const CW_SCHEMA="cw-v1";
+const cwKey=(system,id)=>`${CW_SCHEMA}-${system}-${id}`;
+const cwState={system:"GUTS",mode:"AIRLOCK",meta:[],book:null,ci:0,pi:0,dirty:false};
+
+function cwMeta(){
+  return cwState.system==="GUTS" ? CW_GUTS : state.meta.map(x=>({id:x.id,title:x.title,author:x.author,file:x.file}));
+}
+async function cwFetchBook(m){
+  const saved=localStorage.getItem(cwKey(cwState.system,m.id));
+  if(saved){try{return JSON.parse(saved)}catch(e){}}
+  const url=cwState.system==="GUTS"
+    ? "https://raw.githubusercontent.com/stanjarin/GUTS/main/public/"+m.file
+    : m.file;
+  const r=await fetch(url,{cache:"no-store"});
+  if(!r.ok)throw new Error("Book load failed: "+r.status);
+  return await r.json();
+}
+function cwPage(){return cwState.book?.chapters?.[cwState.ci]?.pages?.[cwState.pi]}
+function cwChapter(){return cwState.book?.chapters?.[cwState.ci]}
+function cwAirIndex(p){
+  if(!p)return -1;
+  if(Number.isInteger(p.airlock_index)&&p.force_paragraphs?.[p.airlock_index]?.includes("$$"))return p.airlock_index;
+  return Array.isArray(p.force_paragraphs)?p.force_paragraphs.findIndex(x=>String(x).includes("$$")):-1;
+}
+function cwSocketCount(p){
+  return Array.isArray(p?.force_paragraphs)?p.force_paragraphs.reduce((n,x)=>n+(String(x).match(/\$\$\$/g)||[]).length,0):0;
+}
+function cwSaveLocal(){
+  if(!cwState.book)return;
+  localStorage.setItem(cwKey(cwState.system,cwState.book.id),JSON.stringify(cwState.book));
+  cwState.dirty=true;
+}
+function cwDownload(){
+  if(!cwState.book)return;
+  cwSaveLocal();
+  const blob=new Blob([JSON.stringify(cwState.book,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`${cwState.system.toLowerCase()}_${cwState.book.id}_EDITED.json`;
+  a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function cwChooseBook(id){
+  const m=cwMeta().find(x=>x.id===id);if(!m)return;
+  cwState.book=await cwFetchBook(m);cwState.ci=0;cwState.pi=0;cwState.dirty=false;cwRender();
+}
+function cwPageMove(d){
+  if(!cwState.book)return;
+  let ci=cwState.ci,pi=cwState.pi+d;
+  if(pi<0){if(ci===0)return;ci--;pi=cwState.book.chapters[ci].pages.length-1}
+  if(pi>=cwState.book.chapters[ci].pages.length){if(ci===cwState.book.chapters.length-1)return;ci++;pi=0}
+  cwState.ci=ci;cwState.pi=pi;cwRender();
+}
+function cwSaveEdit(){
+  const p=cwPage(),ch=cwChapter();if(!p||!ch)return;
+  if(cwState.mode==="AIRLOCK"){
+    const i=cwAirIndex(p);
+    if(i<0){alert("No $$ airlock on this page.");return}
+    const text=document.querySelector("#cwText").value.trim();
+    const n=(text.match(/\$\$\$/g)||[]).length;
+    if(n!==1){alert("AIRLOCK must contain exactly one $$ socket.");return}
+    p.force_paragraphs[i]=text;
+    p.airlock_index=i;
+  }else{
+    const paras=document.querySelector("#cwText").value.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+    if(!paras.length){alert("CORPUS page cannot be empty.");return}
+    p.paragraphs=paras;
+    p.word_count=paras.join(" ").trim().split(/\s+/).filter(Boolean).length;
+    const h=document.querySelector("#cwHeading");
+    if(h&&h.value.trim())ch.title=h.value.trim();
+  }
+  cwSaveLocal();cwRender();
+}
+function cwResetBook(){
+  if(!cwState.book)return;
+  if(!confirm("Discard local workshop edits for this "+cwState.system+" book?"))return;
+  localStorage.removeItem(cwKey(cwState.system,cwState.book.id));
+  const id=cwState.book.id;cwState.book=null;cwChooseBook(id);
+}
+function cwImport(){
+  const input=document.createElement("input");input.type="file";input.accept=".json,application/json";
+  input.onchange=async()=>{
+    const file=input.files?.[0];if(!file)return;
+    try{
+      const b=JSON.parse(await file.text());
+      if(!b.id||!Array.isArray(b.chapters))throw new Error("Not a corpus book JSON");
+      cwState.book=b;cwState.ci=0;cwState.pi=0;cwSaveLocal();cwRender();
+    }catch(e){alert("Import failed: "+e.message)}
+  };
+  input.click();
+}
+function cwRender(){
+  const ov=document.querySelector(".cw");if(!ov)return;
+  const metas=cwMeta();
+  const bookOpts=metas.map(m=>`<option value="${esc(m.id)}"${cwState.book?.id===m.id?" selected":""}>${esc(m.title)}</option>`).join("");
+  const ch=cwChapter(),p=cwPage(),ai=cwAirIndex(p),socketCount=cwSocketCount(p);
+  const chOpts=cwState.book?cwState.book.chapters.map((x,i)=>`<option value="${i}"${i===cwState.ci?" selected":""}>${i+1}. ${esc(x.title||x.source_title||("Chapter "+(i+1)))}</option>`).join(""):"";
+  const pageOpts=ch?ch.pages.map((x,i)=>`<option value="${i}"${i===cwState.pi?" selected":""}>Page ${i+1}</option>`).join(""):"";
+  let editText="",context="",warn="";
+  if(p&&cwState.mode==="AIRLOCK"){
+    if(ai>=0){
+      editText=String(p.force_paragraphs[ai]);
+      const before=p.paragraphs?.[Math.max(0,ai-1)]||"";
+      const after=p.paragraphs?.[Math.min((p.paragraphs?.length||1)-1,ai)]||"";
+      context=`<p><b>GENUINE CONTEXT</b></p><p>${esc(before)}</p><p>⟦ AIRLOCK ⟧</p><p>${esc(after)}</p>`;
+      if(socketCount!==1)warn=`Socket count on prepared page: ${socketCount}`;
+    }else{
+      warn="No $$ airlock on this page.";
+      context=(p.paragraphs||[]).map(x=>`<p>${esc(x)}</p>`).join("");
+    }
+  }else if(p){
+    editText=(p.paragraphs||[]).join("\n\n");
+    context=Array.isArray(p.force_paragraphs)?`<p><b>PREPARED LAYER EXISTS</b> — untouched by CORPUS mode.</p>`:"";
+  }
+  ov.innerHTML=`<div class="cwTop"><b>CORPUS WORKSHOP</b><span class="cwStatus ${cwState.dirty?"cwDirty":""}">${cwState.dirty?"LOCAL CHANGES":""}</span><span class="sp"></span><button id="cwClose">RETURN TO NOBO</button></div>
+  <div class="cwBar">
+    <select id="cwSystem"><option${cwState.system==="GUTS"?" selected":""}>GUTS</option><option${cwState.system==="NoBo"?" selected":""}>NoBo</option></select>
+    <select id="cwMode"><option${cwState.mode==="AIRLOCK"?" selected":""}>AIRLOCK</option><option${cwState.mode==="CORPUS"?" selected":""}>CORPUS</option></select>
+    <select id="cwBook">${bookOpts}</select>
+    <select id="cwChapter">${chOpts}</select>
+    <select id="cwPage">${pageOpts}</select>
+  </div>
+  <div class="cwBody">
+    <div class="cwMeta">${cwState.book?esc(cwState.book.title||cwState.book.id):"Loading…" }${ch?" · "+esc(ch.title||ch.source_title||""):""}${p?" · page "+(cwState.pi+1):""}</div>
+    ${cwState.mode==="CORPUS"&&ch?`<input id="cwHeading" value="${esc(ch.title||ch.source_title||"")}">`:""}
+    <div class="cwContext">${context||"<p>Select a book/page.</p>"}</div>
+    <textarea id="cwText"${!p||cwState.mode==="AIRLOCK"&&ai<0?" disabled":""}>${esc(editText)}</textarea>
+    <div class="cwFoot"><button id="cwPrev">◀ PAGE</button><button id="cwNext">PAGE ▶</button><button id="cwSave">SAVE LOCAL</button><span class="cwWarn">${esc(warn)}</span><span class="sp"></span><button id="cwImport">IMPORT</button><button id="cwExport">EXPORT BOOK</button><button id="cwReset">RESET BOOK</button></div>
+  </div>`;
+  document.querySelector("#cwClose").onclick=()=>ov.remove();
+  document.querySelector("#cwSystem").onchange=async e=>{cwState.system=e.target.value;cwState.book=null;cwState.ci=0;cwState.pi=0;cwState.dirty=false;cwRender();await cwChooseBook(cwMeta()[0].id)};
+  document.querySelector("#cwMode").onchange=e=>{cwState.mode=e.target.value;cwRender()};
+  document.querySelector("#cwBook").onchange=e=>cwChooseBook(e.target.value);
+  document.querySelector("#cwChapter").onchange=e=>{cwState.ci=Number(e.target.value);cwState.pi=0;cwRender()};
+  document.querySelector("#cwPage").onchange=e=>{cwState.pi=Number(e.target.value);cwRender()};
+  document.querySelector("#cwPrev").onclick=()=>cwPageMove(-1);
+  document.querySelector("#cwNext").onclick=()=>cwPageMove(1);
+  document.querySelector("#cwSave").onclick=cwSaveEdit;
+  document.querySelector("#cwImport").onclick=cwImport;
+  document.querySelector("#cwExport").onclick=cwDownload;
+  document.querySelector("#cwReset").onclick=cwResetBook;
+}
+async function openCorpusWorkshop(){
+  document.querySelector(".adminPanel")?.remove();
+  const ov=document.createElement("div");ov.className="cw";document.body.appendChild(ov);
+  cwState.system="GUTS";cwState.mode="AIRLOCK";cwState.book=null;cwState.ci=0;cwState.pi=0;cwState.dirty=false;
+  cwRender();
+  try{await cwChooseBook(CW_GUTS[0].id)}catch(e){ov.innerHTML=`<div class="cwTop"><b>CORPUS WORKSHOP</b><span class="sp"></span><button onclick="this.closest('.cw').remove()">RETURN TO NOBO</button></div><div class="cwBody"><pre>${esc(e.stack||e)}</pre></div>`}
+}
+
+
 document.addEventListener("keydown",e=>{
   if(document.querySelector(".editor"))return;
   if(state.screen==="reader"){if(e.key==="ArrowLeft")pageMove(-1);if(e.key==="ArrowRight")pageMove(1)}
