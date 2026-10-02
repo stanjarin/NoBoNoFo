@@ -54,3 +54,32 @@ Frozen runtime anchor:
 - paired GUTS `release-2026-10-02-production-pass` @ `4e6c5c4835fb858ba10409962af694657d921d77`
 
 No functional work is open.
+
+---
+
+## Immediate handover update — 2 Oct 2026
+
+Current NoBo now includes the back-room **Corpus Workshop**.
+
+Entry:
+- book open → **EDIT**
+- Library → long-press **MORE → DATA**
+
+Workshop:
+- **GUTS / NoBo**
+- **AIRLOCK / CORPUS**
+- current book/chapter/page carried across where possible
+- **DONE / CANCEL**
+- **IMPORT / EXPORT BOOK / RESET BOOK**
+- **RETURN TO NOBO**
+
+AIRLOCK edits prepared `$$$` text and shows full genuine-page context with **⟦ AIRLOCK HERE ⟧**.
+CORPUS edits genuine page text/chapter heading.
+Edits remain local until exported; browser workshop does not write directly to GitHub.
+
+Rollback before workshop:
+`rollback-pre-corpus-workshop-2026-10-02`
+
+Read `NOBO_CORPUS_WORKSHOP_HANDOVER_2026-10-02.md` before further workshop changes.
+
+Paired GUTS has completed a full 18-book airlock placement/retention sweep with machine QA PASS; phone/visual spot-check of that repaired prepared layer is the next action.
