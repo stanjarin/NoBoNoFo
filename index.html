@@ -1159,7 +1159,7 @@ function cwRender(){
     ${cwState.mode==="CORPUS"&&ch?`<input id="cwHeading" value="${esc(ch.title||ch.source_title||"")}">`:""}
     <div class="cwContext">${context||"<p>Select a book/page.</p>"}</div>
     <textarea id="cwText"${!p||cwState.mode==="AIRLOCK"&&ai<0?" disabled":""}>${esc(editText)}</textarea>
-    <div class="cwFoot"><button id="cwPrev">◀ PAGE</button><button id="cwNext">PAGE ▶</button><button id="cwSave">SAVE LOCAL</button><span class="cwWarn">${esc(warn)}</span><span class="sp"></span><button id="cwImport">IMPORT</button><button id="cwExport">EXPORT BOOK</button><button id="cwReset">RESET BOOK</button></div>
+    <div class="cwFoot"><button id="cwPrev">◀ PAGE</button><button id="cwNext">PAGE ▶</button><button id="cwDone">DONE</button><button id="cwCancel">CANCEL</button><span class="cwWarn">${esc(warn)}</span><span class="sp"></span><button id="cwImport">IMPORT</button><button id="cwExport">EXPORT BOOK</button><button id="cwReset">RESET BOOK</button></div>
   </div>`;
   document.querySelector("#cwClose").onclick=()=>ov.remove();
   document.querySelector("#cwSystem").onchange=async e=>{cwState.system=e.target.value;cwState.book=null;cwState.ci=0;cwState.pi=0;cwState.dirty=false;cwRender();await cwChooseBook(cwMeta()[0].id)};
@@ -1170,7 +1170,8 @@ function cwRender(){
   document.querySelector("#cwPage").onchange=e=>{cwState.pi=Number(e.target.value);cwRender()};
   document.querySelector("#cwPrev").onclick=()=>cwPageMove(-1);
   document.querySelector("#cwNext").onclick=()=>cwPageMove(1);
-  document.querySelector("#cwSave").onclick=cwSaveEdit;
+  document.querySelector("#cwDone").onclick=cwSaveEdit;
+  document.querySelector("#cwCancel").onclick=()=>cwRender();
   document.querySelector("#cwImport").onclick=cwImport;
   document.querySelector("#cwExport").onclick=cwDownload;
   document.querySelector("#cwReset").onclick=cwResetBook;
