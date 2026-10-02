@@ -1175,11 +1175,24 @@ function cwRender(){
   document.querySelector("#cwReset").onclick=cwResetBook;
 }
 async function openCorpusWorkshop(){
+  const openId=state.book?.id||null;
+  const openCi=Number.isInteger(state.ci)?state.ci:0;
+  const openPi=Number.isInteger(state.pi)?state.pi:0;
   document.querySelector(".adminPanel")?.remove();
   const ov=document.createElement("div");ov.className="cw";document.body.appendChild(ov);
-  cwState.system="GUTS";cwState.mode="AIRLOCK";cwState.book=null;cwState.ci=0;cwState.pi=0;cwState.dirty=false;
+  const inGuts=!!openId&&CW_GUTS.some(x=>x.id===openId);
+  const inNoBo=!!openId&&state.meta.some(x=>x.id===openId);
+  cwState.system=inGuts?"GUTS":inNoBo?"NoBo":"GUTS";
+  cwState.mode="AIRLOCK";cwState.book=null;cwState.ci=0;cwState.pi=0;cwState.dirty=false;
   cwRender();
-  try{await cwChooseBook(CW_GUTS[0].id)}catch(e){ov.innerHTML=`<div class="cwTop"><b>CORPUS WORKSHOP</b><span class="sp"></span><button onclick="this.closest('.cw').remove()">RETURN TO NOBO</button></div><div class="cwBody"><pre>${esc(e.stack||e)}</pre></div>`}
+  try{
+    const targetId=(inGuts||inNoBo)?openId:cwMeta()[0].id;
+    await cwChooseBook(targetId);
+    cwState.ci=Math.max(0,Math.min(openCi,(cwState.book?.chapters?.length||1)-1));
+    const pages=cwState.book?.chapters?.[cwState.ci]?.pages||[];
+    cwState.pi=Math.max(0,Math.min(openPi,Math.max(0,pages.length-1)));
+    cwRender();
+  }catch(e){ov.innerHTML=`<div class="cwTop"><b>CORPUS WORKSHOP</b><span class="sp"></span><button onclick="this.closest('.cw').remove()">RETURN TO NOBO</button></div><div class="cwBody"><pre>${esc(e.stack||e)}</pre></div>`}
 }
 
 
