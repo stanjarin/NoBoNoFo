@@ -43,3 +43,14 @@ Passed on iPhone: [WORD] persists across books and HIDD/SHW; refresh preserves i
 - pre-promotion NoBo rollback: `rollback-pre-promotion-2026-10-02` @ `93d4ade5fee65d9931c5c6ad1b1b25cad8c18235`
 - paired phone-QA GUTS anchor: `59b6e1015cc7ff8bc51bedbd1a874d974b6710b5`
 - promotion scope remains deployment only.
+
+
+## Final production pass — 2 October 2026
+
+Stanley reported **“All systems nominal!”**
+
+Frozen runtime anchor:
+- NoBo `release-2026-10-02-production-pass` @ `6dcd4b33429788f413f6fd80e503f08553eda0cd`
+- paired GUTS `release-2026-10-02-production-pass` @ `4e6c5c4835fb858ba10409962af694657d921d77`
+
+No functional work is open.
