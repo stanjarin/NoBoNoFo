@@ -308,7 +308,7 @@ for(const [id,src] of Object.entries(COVER)){
   const img=new Image(); img.src=src; COVER_PRELOAD[id]=img;
 }
 
-const BUILD_VERSION="v6.20P";
+const BUILD_VERSION="v6.20Q";
 const GUTS_BASE="https://ebooks.fyi";
 const GUTS_BROWSE_URL="https://guts-browse-2026-10-03-guts.stanjarin.workers.dev/?browse=1";
 const PIN_VALID_KEY="guts-arm-pin-valid";
@@ -829,7 +829,7 @@ function render(){
       <div class="libraryScroll"><div style="position:relative">
         <img class="libraryArt" src="assets/LIBRARY_BODY.png" alt="Library">
         ${LIB_ORDER.map((id,i)=>`<button class="libHit" data-id="${id}" style="left:${zones[i][0]}%;top:${zones[i][1]}%;width:${zones[i][2]}%;height:${zones[i][3]}%" aria-label="${id}"></button>`).join("")}
-        <div class="libraryV6">v6.20P</div>
+        <div class="libraryV6">v6.20Q</div>
       </div></div>
       <img class="libraryBase" src="assets/LIBRARY_BASE.png" alt="">
 <button class="adminHot" id="adminHot" type="button" aria-label="More"></button>
