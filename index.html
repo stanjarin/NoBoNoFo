@@ -856,7 +856,7 @@ function render(){
         const storedPin=localStorage.getItem("guts-arm-pin");
         if(storedPin)validateGutsPin(storedPin).then(()=>paintPin(true)).catch(()=>paintPin(false));else paintPin(false);
         $("#resetTest").onclick=()=>resetMagic();
-        $("#browseToggle").onclick=()=>{browseMode=true;localStorage.setItem(BROWSEKEY,"1");$("#browseToggle").textContent="BR+";window.location.replace(GUTS_BROWSE_URL)};
+        $("#browseToggle").onclick=()=>{const next=!browseMode;browseMode=next;localStorage.setItem(BROWSEKEY,next?"1":"0");$("#browseToggle").textContent=next?"BR+":"BR-";if(next){window.open(GUTS_BROWSE_URL,"_blank")}else{render()}};
         $("#dataToggle").onclick=openCorpusWorkshop;
         $("#fileInput").onchange=importBook;
         $("#exportStored").onclick=exportStoredBookData;
