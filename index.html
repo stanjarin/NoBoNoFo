@@ -310,7 +310,7 @@ for(const [id,src] of Object.entries(COVER)){
 
 const BUILD_VERSION="v6.20Q";
 const GUTS_BASE="https://ebooks.fyi";
-const GUTS_BROWSE_URL="https://guts-browse-2026-10-03-guts.stanjarin.workers.dev/?browse=1";
+const GUTS_BROWSE_URL="https://jeeves-factory-pilot-2026-10-06-guts.stanjarin.workers.dev/?browse=1";
 const PIN_VALID_KEY="guts-arm-pin-valid";
 const MAGICKEY="nobonofo-magic-pass5m";
 const BROWSEKEY="nobonofo-browse-v1";
@@ -856,7 +856,7 @@ function render(){
         const storedPin=localStorage.getItem("guts-arm-pin");
         if(storedPin)validateGutsPin(storedPin).then(()=>paintPin(true)).catch(()=>paintPin(false));else paintPin(false);
         $("#resetTest").onclick=()=>resetMagic();
-        $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−");if(browseMode)window.open(GUTS_BROWSE_URL,"_blank")};
+        $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−");if(browseMode)location.assign(GUTS_BROWSE_URL)};
         $("#dataToggle").onclick=openCorpusWorkshop;
         $("#fileInput").onchange=importBook;
         $("#exportStored").onclick=exportStoredBookData;
