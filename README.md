@@ -1,3 +1,5 @@
+> **Current paired GUTS/NoBo operations handover (9 Oct 2026):** https://github.com/stanjarin/GUTS/blob/main/OPERATIONS_START_HERE.md . Read before investigating Cloudflare, SHW/HIDD, BR+ or the 18-book Reader. This file contains actual validated deployment wiring and the next visual QA task.
+
 # START HERE
 
 Fresh ewe: read `NOBO_HANDOVER_2026-10-02.md` first, then this README.
