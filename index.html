@@ -848,14 +848,15 @@ function render(){
         const panel=document.createElement("div");panel.className="adminPanel";
         const readyOK=magic.phase==="READY";
         const pinOK=!!localStorage.getItem("guts-arm-pin")&&localStorage.getItem(PIN_VALID_KEY)==="1";
-        panel.innerHTML=`<button id="resetTest">RSET</button><button id="showToggle">SHW …</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="dataToggle">DATA</button><span class="adminStatus ${readyOK?"adminGood":"adminBad"}">READY ${readyOK?"√":"X"}</span><span id="pinStatus" class="adminStatus ${pinOK?"adminGood":"adminBad"}">PIN</span><button id="closeAdmin">&gt;</button><span id="dataActions" class="adminData hidden"><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="exportStored">EXPRT</button><button id="deportBooks">DEPRT</button></span>`;
+        panel.innerHTML=`<button id="resetTest">RSET</button><button id="showToggle">SHW …</button><button id="browseToggle">BR${browseMode?"+":"−"}</button><button id="gutsBrowseLaunch" style="${browseMode?"":"display:none;"}">GUTS ↗</button><button id="dataToggle">DATA</button><span class="adminStatus ${readyOK?"adminGood":"adminBad"}">READY ${readyOK?"√":"X"}</span><span id="pinStatus" class="adminStatus ${pinOK?"adminGood":"adminBad"}">PIN</span><button id="closeAdmin">&gt;</button><span id="dataActions" class="adminData hidden"><label class="importLabel">IMPRT<input id="fileInput" type="file" accept=".json"></label><button id="exportStored">EXPRT</button><button id="deportBooks">DEPRT</button></span>`;
         app.appendChild(panel);
         const pinStatus=$("#pinStatus");
         const paintPin=ok=>{pinStatus.classList.toggle("adminGood",!!ok);pinStatus.classList.toggle("adminBad",!ok)};
         const storedPin=localStorage.getItem("guts-arm-pin");
         if(storedPin)validateGutsPin(storedPin).then(()=>paintPin(true)).catch(()=>paintPin(false));else paintPin(false);
         $("#resetTest").onclick=()=>resetMagic();
-        $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−")};
+        $("#browseToggle").onclick=()=>{browseMode=!browseMode;localStorage.setItem(BROWSEKEY,browseMode?"1":"0");$("#browseToggle").textContent="BR"+(browseMode?"+":"−");$("#gutsBrowseLaunch").style.display=browseMode?"":"none"};
+        $("#gutsBrowseLaunch").onclick=()=>{if(browseMode)location.assign("https://www3.library.gutenbrg.com/project_library/books/browse/?browse=1")};
         $("#dataToggle").onclick=openCorpusWorkshop;
         $("#fileInput").onchange=importBook;
         $("#exportStored").onclick=exportStoredBookData;
